@@ -99,7 +99,7 @@ def main(
     elif chat:
         model, tokenizer = load_model_and_tokenizer(
             config,
-            model_name=model_name,
+            model_name=config.INFERENCE_MODEL,
             model_output=model_output,
         )
         model.eval()  # Set the model to evaluation mode
