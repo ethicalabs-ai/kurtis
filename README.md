@@ -1,6 +1,6 @@
 # Kurtis
 
-**Kurtis** is ax experimental training, evaluation and inference tool for small-language models (SLMs).
+**Kurtis** is an experimental training, evaluation and inference tool for small-language models (SLMs).
 
 ![Kurtis in action - Evaluation](images/screenshots/kurtis-eval.png)
 ![Kurtis in action - Chat](images/screenshots/kurtis-chat.png)
