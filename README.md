@@ -18,7 +18,7 @@ Kurtis final model allows users to ask questions related to mental health topics
 
 ### Prerequisites
 
-- **Poetry** for dependency management.
+- **uv** for dependency management.
 - **Python 3.10 or higher**.
 - Docker (optional, if you plan to use Docker).
 
