@@ -107,6 +107,7 @@ def main(
         start_chat_wrapper(
             model,
             tokenizer,
+            config,
             inference_model,
         )
     elif eval_model:

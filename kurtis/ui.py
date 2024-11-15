@@ -23,9 +23,10 @@ def get_timestamp():
 
 
 class ChatApp(urwid.WidgetWrap):
-    def __init__(self, model, tokenizer, inference_fn, **kwargs):
+    def __init__(self, model, tokenizer, config, inference_fn, **kwargs):
         self.model = model
         self.tokenizer = tokenizer
+        self.config = config
         self.inference_fn = inference_fn
         self.kwargs = kwargs
 
@@ -95,7 +96,7 @@ class ChatApp(urwid.WidgetWrap):
         """Generate response in a separate thread."""
         try:
             response = self.inference_fn(
-                self.model, self.tokenizer, input_text, **self.kwargs
+                self.model, self.tokenizer, self.config, input_text, **self.kwargs
             )
             ai_message = f"[{get_timestamp()}] Kurtis: {response}"
             # Schedule the UI update in the main loop
@@ -137,6 +138,6 @@ class ChatApp(urwid.WidgetWrap):
 
 
 # Start the chat application
-def start_chat_wrapper(model, tokenizer, inference_fn, **kwargs):
-    app = ChatApp(model, tokenizer, inference_fn, **kwargs)
+def start_chat_wrapper(model, tokenizer, config, inference_fn, **kwargs):
+    app = ChatApp(model, tokenizer, config, inference_fn, **kwargs)
     app.run()

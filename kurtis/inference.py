@@ -6,6 +6,7 @@ from .utils import get_device
 def inference_model(
     model,
     tokenizer,
+    config,
     input_text,
 ):
     """
@@ -28,7 +29,7 @@ def inference_model(
         messages = [
             {
                 "role": "system",
-                "content": "You are a compassionate and empathetic mental-health assistant, providing thoughtful and supportive responses to user queries.",
+                "content": config.QA_INSTRUCTION,
             },
             {"role": "user", "content": input_text},
         ]

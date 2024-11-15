@@ -59,3 +59,5 @@ LORA_CONFIG = LoraConfig(
     target_modules=["q_proj", "v_proj"],
     bias="none",
 )
+
+QA_INSTRUCTION = "You are a compassionate and empathetic mental-health assistant, providing thoughtful and supportive responses to user queries."

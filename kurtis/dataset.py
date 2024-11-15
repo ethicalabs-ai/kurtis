@@ -28,7 +28,7 @@ def load_preprocessing_dataset_from_config(config):
         lambda x: {
             "question": str(x[config["text_column"]]),
             "answer": str(x[config["response_column"]]),
-            "dataset_name": config["name"],
+            "dataset_name": str(x.get("dataset_name", config["name"])),
         }
     )
     return dataset

@@ -53,20 +53,25 @@ def clean_and_truncate(text, max_length, tokenizer):
 
 def generate_summary(text, model, tokenizer, debug=False):
     device = get_device()
-    input_text = "summarize:\n\n" + text
-    inputs = tokenizer(input_text, return_tensors="pt", max_length=512, truncation=True)
-    attention_mask = inputs["attention_mask"].to(device)
-    summary_ids = model.generate(
-        input_ids=inputs["input_ids"].to(device),
+    messages = [
+        {
+            "role": "system",
+            "content": "Summarize the following text.",
+        },
+        {"role": "user", "content": text},
+    ]
+    input_text = tokenizer.apply_chat_template(messages, tokenize=False)
+    inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
+    summary = model.generate(
+        inputs,
         max_length=256,
-        min_length=16,
+        min_length=32,
+        num_beams=4,
         length_penalty=2.0,
         repetition_penalty=2.5,
-        num_beams=4,
         early_stopping=True,
-        attention_mask=attention_mask,
+        eos_token_id=tokenizer.eos_token_id,
     )
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     return summary
 
 
@@ -75,7 +80,9 @@ def _augment_data_with_llm(examples, tokenizer, model, debug=False):
     answer = examples["answer"]
     dataset_name = examples["dataset_name"]
     answer_summary = generate_summary(f"{answer}", model, tokenizer, debug=debug)
-    summary = generate_summary(f"{question}\n{answer}", model, tokenizer, debug=debug)
+    summary = generate_summary(
+        f"User: {question}\nAssistant: {answer}", model, tokenizer, debug=debug
+    )
     data = {
         "question": question,
         "answer": answer,
