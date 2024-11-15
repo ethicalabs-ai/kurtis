@@ -23,7 +23,7 @@ def load_datasets(config):
     dataset_list = []
     for ds_config in config.DATASETS_CONFIG.values():
         dataset = load_preprocessing_dataset_from_config(
-            ds_config, tokenizer=None, as_dataset=True
+            ds_config,
         )
         dataset_list.append(dataset)  # Assuming 'train' split
     return concatenate_datasets(dataset_list)
@@ -200,8 +200,6 @@ def preprocessing_main(config, max_length=512, refresh=False, debug=False):
                 "text_column": "question",
                 "response_column": "answer",
             },
-            tokenizer=None,
-            as_dataset=True,
         )
     else:
         initial_dataset = prepare_initial_dataset(config, tokenizer, max_length)
