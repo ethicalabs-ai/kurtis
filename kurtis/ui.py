@@ -1,4 +1,3 @@
-import threading
 from datetime import datetime
 
 import urwid
@@ -59,6 +58,8 @@ class ChatApp(urwid.WidgetWrap):
 
         # Connect the 'submit' signal from the input field to the handle_input method
         urwid.connect_signal(self.input_field, "submit", self.handle_input)
+        urwid.register_signal(ChatApp, ["update_message"])
+        urwid.connect_signal(self, "update_message", self.update_message)
 
     def add_message(self, message, style):
         """Add a new message to the chat history and refresh the UI."""
@@ -66,6 +67,7 @@ class ChatApp(urwid.WidgetWrap):
         self.chat_history.append(urwid.AttrMap(message_widget, style))
         # Auto-scroll to the latest message
         self.chat_box.set_focus(len(self.chat_history) - 1)
+        self._invalidate()  # Refresh the UI immediately
 
     def handle_input(self, widget=None):
         """Handle user input and generate a response."""
@@ -83,15 +85,11 @@ class ChatApp(urwid.WidgetWrap):
             self.chat_box.set_focus(len(self.chat_history) - 1)
 
             # Run inference in a separate thread
-            threading.Thread(
-                target=self.generate_response,
-                args=(input_text, len(self.chat_history) - 1),
-                daemon=True,
-            ).start()
+            self.generate_response(input_text, len(self.chat_history) - 1)
 
             # Clear the input field
             self.input_field.set_edit_text("")
-            urwid.emit_signal(self.input_field, "change")
+            self._invalidate()  # Refresh the UI immediately
 
     def generate_response(self, input_text, loading_index):
         """Generate response in a separate thread."""
@@ -100,17 +98,17 @@ class ChatApp(urwid.WidgetWrap):
                 self.model, self.tokenizer, input_text, **self.kwargs
             )
             ai_message = f"[{get_timestamp()}] Kurtis: {response}"
-            self.chat_history[loading_index] = urwid.AttrMap(
-                urwid.Text(ai_message), "bot"
-            )
+            # Schedule the UI update in the main loop
+            self.update_message(ai_message, loading_index)
         except Exception as e:
             error_message = f"[{get_timestamp()}] Kurtis: (Error: {str(e)})"
-            self.chat_history[loading_index] = urwid.AttrMap(
-                urwid.Text(error_message), "bot"
-            )
+            # Schedule the UI update in the main loop
+            urwid.emit_signal(self, "update_message", error_message, loading_index)
 
-        # Refresh the UI after updating the message
-        self.main_view.body._invalidate()
+    def update_message(self, message, index):
+        """Update the message in the chat history."""
+        self.chat_history[index] = urwid.AttrMap(urwid.Text(message), "bot")
+        self._invalidate()
 
     def unhandled_input(self, key):
         """Handle global key inputs."""
