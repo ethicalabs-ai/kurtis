@@ -56,7 +56,7 @@ def generate_summary(text, model, tokenizer, debug=False):
     messages = [
         {
             "role": "system",
-            "content": "Summarize the following text.",
+            "content": "Summarize the following text in a few sentences, focusing only on the key points. Provide the summary directly without any additional explanation or comments.",
         },
         {"role": "user", "content": text},
     ]
@@ -64,7 +64,7 @@ def generate_summary(text, model, tokenizer, debug=False):
     inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(device)
     outputs = model.generate(
         inputs,
-        max_length=256,
+        max_length=512,
         min_length=32,
         num_beams=4,
         length_penalty=2.0,
