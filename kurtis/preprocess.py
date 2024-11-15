@@ -62,7 +62,7 @@ def generate_summary(text, model, tokenizer, debug=False):
     ]
     input_text = tokenizer.apply_chat_template(messages, tokenize=False)
     inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
-    summary = model.generate(
+    outputs = model.generate(
         inputs,
         max_length=256,
         min_length=32,
@@ -72,6 +72,8 @@ def generate_summary(text, model, tokenizer, debug=False):
         early_stopping=True,
         eos_token_id=tokenizer.eos_token_id,
     )
+    new_tokens = outputs[0][inputs.shape[-1] :]
+    summary = tokenizer.decode(new_tokens, skip_special_tokens=True)
     return summary
 
 
