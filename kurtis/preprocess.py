@@ -61,7 +61,7 @@ def generate_summary(text, model, tokenizer, debug=False):
         {"role": "user", "content": text},
     ]
     input_text = tokenizer.apply_chat_template(messages, tokenize=False)
-    inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
+    inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(device)
     outputs = model.generate(
         inputs,
         max_length=256,

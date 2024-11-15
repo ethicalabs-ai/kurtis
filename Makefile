@@ -35,7 +35,7 @@ help:
 # Train the model
 .PHONY: preprocessing
 preprocessing:
-	uv run $(PYTHON) -m $(MODULE) --preprocessing --config-module $(CONFIG_MODULE)
+	uv run $(PYTHON) -m $(MODULE) --preprocessing --config-module $(CONFIG_MODULE) --debug
 
 # Train the model
 .PHONY: train
