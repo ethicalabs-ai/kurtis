@@ -30,7 +30,7 @@ def load_model_and_tokenizer(
     if not model_name:
         model_name = config.TRANSFORMERS_MODEL_PRETRAINED
 
-    if os.path.exists(model_output):
+    if model_output and os.path.exists(model_output):
         model_name = os.path.join(model_output, checkpoint_name)
     click.echo(f"Loading model and tokenizer: {model_name}")
     tokenizer = AutoTokenizer.from_pretrained(config.TRANSFORMERS_MODEL_PRETRAINED)
