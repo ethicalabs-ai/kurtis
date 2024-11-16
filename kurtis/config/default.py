@@ -47,8 +47,8 @@ DATASETS_CONFIG = {
 
 FINAL_DATASETS = {
     "datasets/kurtis_mental_health": "mrs83/kurtis_mental_health",
-    "datasets/kurtis_mental_health_initial": "mrs83/kurtis_mental_health_initial",
-    "datasets/kurtis_mental_health_final": "mrs83/kurtis_mental_health_final",
+    "datasets/kurtis_mental_health_initial_v2": "mrs83/kurtis_mental_health_initial_v2",
+    "datasets/kurtis_mental_health_final_v2": "mrs83/kurtis_mental_health_final_v2",
 }
 
 LORA_CONFIG = LoraConfig(

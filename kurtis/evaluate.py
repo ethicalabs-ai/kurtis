@@ -112,7 +112,9 @@ def evaluate_main(
     click.echo("Testing on kurtis dataset")
     dataset = load_kurtis_dataset_from_config(config.TRAINING_CONFIG)
 
-    val_dataset = dataset.shuffle(seed=42).select(range(max(1, int(0.05 * len(dataset)))))
+    val_dataset = dataset.shuffle(seed=42).select(
+        range(max(1, int(0.05 * len(dataset))))
+    )
 
     # Evaluate the model
     click.echo("Evaluating the model...")

@@ -34,7 +34,9 @@ def inference_model(
             {"role": "user", "content": input_text},
         ]
         input_text = tokenizer.apply_chat_template(messages, tokenize=False)
-        inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(device)
+        inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(
+            device
+        )
         with torch.no_grad():
             outputs = model.generate(
                 inputs,

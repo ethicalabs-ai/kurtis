@@ -61,7 +61,9 @@ def generate_summary(text, model, tokenizer, debug=False):
         {"role": "user", "content": text},
     ]
     input_text = tokenizer.apply_chat_template(messages, tokenize=False)
-    inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(device)
+    inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(
+        device
+    )
     outputs = model.generate(
         inputs,
         max_length=256,
@@ -185,20 +187,30 @@ def save_dataset(dataset, file_name):
     df.to_parquet(file_name)
 
 
-def preprocessing_main(config, max_length=512, refresh=False, debug=False):
+def preprocessing_main(
+    config,
+    max_length=512,
+    refresh=False,
+    initial_dataset_name="kurtis_mental_health_initial_v2",
+    final_dataset_name="kurtis_mental_health_final_v2",
+    debug=False,
+):
     if not torch.cuda.is_available():
         click.echo("CUDA is required to run data augmentation on initial dataset.")
 
     model, tokenizer = load_model_and_tokenizer(config, config.DATA_AUGMENTATION_MODEL)
+
+    # Initial dataset is aggregate from different sources.
     initial_dataset_filename = (
-        "datasets/kurtis_mental_health_initial/initial_dataset.parquet"
+        f"datasets/{initial_dataset_name}/initial_dataset.parquet"
     )
-    final_dataset_filename = "datasets/kurtis_mental_health_final/final_dataset.parquet"
+    # Final dataset is augmentated with summaries.
+    final_dataset_filename = f"datasets/{final_dataset_name}/final_dataset.parquet"
 
     if os.path.exists(initial_dataset_filename) and not refresh:
         initial_dataset = load_preprocessing_dataset_from_config(
             {
-                "name": "datasets/kurtis_mental_health_initial",
+                "name": f"datasets/{initial_dataset_name}",
                 "text_column": "question",
                 "response_column": "answer",
             },
