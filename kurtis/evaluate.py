@@ -15,7 +15,7 @@ rouge = evaluate.load("rouge")
 device = get_device()
 
 
-def evaluate_model(model, tokenizer, dataset, max_length=2048, debug=False):
+def evaluate_model(model, tokenizer, config, dataset, max_length=2048, debug=False):
     """
     Evaluate the model on the validation set with attention masks.
     Returns: Average validation loss, Rouge score, accuracy, F1, precision, recall.
@@ -31,7 +31,7 @@ def evaluate_model(model, tokenizer, dataset, max_length=2048, debug=False):
 
     with torch.no_grad():
         for example in dataset:
-            prediction = inference_model(model, tokenizer, example["question"])
+            prediction = inference_model(model, tokenizer, config, example["question"])
 
             all_preds.append(prediction)
             all_labels.extend(example["answer"])
@@ -100,8 +100,8 @@ def evaluate_model(model, tokenizer, dataset, max_length=2048, debug=False):
 
 def evaluate_main(
     model,
-    config,
     tokenizer,
+    config,
     max_length=2048,
     json_path="evaluation_results.json",
     debug=False,
@@ -112,15 +112,14 @@ def evaluate_main(
     click.echo("Testing on kurtis dataset")
     dataset = load_kurtis_dataset_from_config(config.TRAINING_CONFIG)
 
-    train_size = int(0.9 * len(dataset))
-    val_size = len(dataset) - train_size
-    _, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+    val_dataset = dataset.shuffle(seed=42).select(range(max(1, int(0.05 * len(dataset)))))
 
     # Evaluate the model
     click.echo("Evaluating the model...")
     avg_val_loss, rouge_output, accuracy, f1, precision, recall = evaluate_model(
         model,
         tokenizer,
+        config,
         val_dataset,
         max_length=max_length,
         debug=debug,

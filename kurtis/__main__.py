@@ -113,12 +113,12 @@ def main(
     elif eval_model:
         model, tokenizer = load_model_and_tokenizer(
             config,
-            model_name=model_name,
+            model_name=config.INFERENCE_MODEL,
             model_output=model_output,
         )
         model.eval()
         click.echo("Testing the model on configured datasets...")
-        evaluate_main(model, config, tokenizer)
+        evaluate_main(model, tokenizer, config)
     elif push:
         push_datasets_to_huggingface(config)
     else:
