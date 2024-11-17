@@ -105,6 +105,11 @@ def batch_inference(model, tokenizer, config, input_texts, max_length=512):
             eos_token_id=tokenizer.eos_token_id,
         )
 
-    # Decode the outputs
-    responses = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+    responses = [
+        tokenizer.decode(
+            outputs[i][encoded_inputs["input_ids"][i].shape[-1] :],
+            skip_special_tokens=True,
+        )
+        for i in range(len(outputs))
+    ]
     return [response.strip() for response in responses]
