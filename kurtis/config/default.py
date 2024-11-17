@@ -11,7 +11,7 @@ TRAINING_CONFIG = {
     "split": "train",
     "max_samples": 10000,
     "max_length": 2048,
-    "num_train_epochs": 2,
+    "num_train_epochs": 3,
     "warmup_ratio": 0.3,
     "batch_size": 8,
     "lr": 3e-4,
