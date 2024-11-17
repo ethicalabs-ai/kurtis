@@ -72,7 +72,7 @@ def batch_inference(model, tokenizer, config, input_texts, max_length=512):
         list: A list of generated responses from the model.
     """
     device = get_device()
-    model.to(device)
+    # model.to(device)
     model.eval()
 
     # Prepare the inputs
