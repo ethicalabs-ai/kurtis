@@ -8,14 +8,16 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from tqdm import tqdm
 
 from .dataset import load_kurtis_dataset_from_config
-from .inference import inference_model
+from .inference import batch_inference
 from .utils import get_device
 
 rouge = evaluate.load("rouge")
 device = get_device()
 
 
-def evaluate_model(model, tokenizer, config, dataset, max_length=2048, debug=False):
+def evaluate_model(
+    model, tokenizer, config, dataset, max_length=2048, debug=False, batch_size=16
+):
     """
     Evaluate the model on the validation set with attention masks.
     Returns: Average validation loss, Rouge score, accuracy, F1, precision, recall.
@@ -29,15 +31,22 @@ def evaluate_model(model, tokenizer, config, dataset, max_length=2048, debug=Fal
     all_labels = []
     all_preds = []
 
+    # Perform batch inference
     with torch.no_grad():
-        for example in dataset:
-            prediction = inference_model(model, tokenizer, config, example["question"])
+        for batch_start in range(0, total, batch_size):
+            batch_end = min(batch_start + batch_size, total)
+            batch = dataset.select(range(batch_start, batch_end))
+            input_texts = [example["question"] for example in batch]
+            labels = [example["answer"] for example in batch]
 
-            all_preds.append(prediction)
-            all_labels.extend(example["answer"])
-            all_inputs.extend(example["question"])
+            predictions = batch_inference(
+                model, tokenizer, config, input_texts, max_length=max_length
+            )
+            all_preds.extend(predictions)
+            all_labels.extend(labels)
+            all_inputs.extend(input_texts)
 
-            pbar.update(1)
+            pbar.update(len(batch))
         pbar.close()
 
     # Compute Rouge score
@@ -52,7 +61,7 @@ def evaluate_model(model, tokenizer, config, dataset, max_length=2048, debug=Fal
         padding="max_length",
         truncation=True,
         return_tensors="pt",
-    )["input_ids"]
+    )["input_ids"].flatten()
 
     all_preds_tokens = tokenizer(
         all_preds,
@@ -60,29 +69,29 @@ def evaluate_model(model, tokenizer, config, dataset, max_length=2048, debug=Fal
         padding="max_length",
         truncation=True,
         return_tensors="pt",
-    )["input_ids"]
+    )["input_ids"].flatten()
 
-    accuracy = accuracy_score(all_labels_tokens.flatten(), all_preds_tokens.flatten())
+    accuracy = accuracy_score(all_labels_tokens.cpu(), all_preds_tokens.cpu())
     f1 = f1_score(
-        all_labels_tokens.flatten(),
-        all_preds_tokens.flatten(),
+        all_labels_tokens.cpu(),
+        all_preds_tokens.cpu(),
         average="weighted",
         zero_division=0,
     )
     precision = precision_score(
-        all_labels_tokens.flatten(),
-        all_preds_tokens.flatten(),
+        all_labels_tokens.cpu(),
+        all_preds_tokens.cpu(),
         average="weighted",
         zero_division=0,
     )
     recall = recall_score(
-        all_labels_tokens.flatten(),
-        all_preds_tokens.flatten(),
+        all_labels_tokens.cpu(),
+        all_preds_tokens.cpu(),
         average="weighted",
         zero_division=0,
     )
 
-    avg_val_loss = total_val_loss / total
+    avg_val_loss = total_val_loss / total if total > 0 else float("inf")
     if debug:
         click.echo(
             f"Validation Loss: {avg_val_loss}, Rouge-2: {rouge_output}, Accuracy: {accuracy}, F1: {f1}, Precision: {precision}, Recall: {recall}"
@@ -105,6 +114,8 @@ def evaluate_main(
     max_length=2048,
     json_path="evaluation_results.json",
     debug=False,
+    batch_size=8,
+    eval_ratio=0.01,
 ):
     click.echo("Starting evaluation process...")
 
@@ -113,7 +124,7 @@ def evaluate_main(
     dataset = load_kurtis_dataset_from_config(config.TRAINING_CONFIG)
 
     val_dataset = dataset.shuffle(seed=42).select(
-        range(max(1, int(0.05 * len(dataset))))
+        range(max(1, int(eval_ratio * len(dataset))))
     )
 
     # Evaluate the model
@@ -125,6 +136,7 @@ def evaluate_main(
         val_dataset,
         max_length=max_length,
         debug=debug,
+        batch_size=batch_size,
     )
 
     # Log evaluation results
@@ -146,8 +158,10 @@ def evaluate_main(
         "recall": recall,
     }
 
-    os.makedirs("benchmarks", exist_ok=True)
-    with open(f"benchmarks/kurtis-{json_path}", "w") as json_file:
+    benchmarks_path = os.path.join("benchmarks", config.MODEL_NAME)
+    os.makedirs(benchmarks_path, exist_ok=True)
+    json_path = os.path.join(benchmarks_path, json_path)
+    with open(json_path, "w") as json_file:
         json.dump(results, json_file, indent=4)
 
     click.echo(f"Evaluation process completed and results saved to {json_path}.")
