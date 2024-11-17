@@ -45,6 +45,15 @@ DATASETS_CONFIG = {
     },
 }
 
+
+EVALUATION_DATASET = {
+    "name": "alexandreteles/mental-health-conversational-data",
+    "text_column": "Context",
+    "response_column": "Response",
+    "max_samples": 500,
+}
+
+
 FINAL_DATASETS = {
     "datasets/kurtis_mental_health": "mrs83/kurtis_mental_health",
     "datasets/kurtis_mental_health_initial_v2": "mrs83/kurtis_mental_health_initial_v2",
