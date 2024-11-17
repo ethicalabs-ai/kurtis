@@ -13,7 +13,7 @@ TRAINING_CONFIG = {
     "max_length": 2048,
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
-    "batch_size": 16,
+    "batch_size": 8,
     "lr": 3e-4,
     "accumulation_steps": 1,
     "weight_decay": 2e-2,
