@@ -31,7 +31,7 @@ def train_model(
             prompt = [
                 {
                     "role": "system",
-                    "content": "You are a compassionate and empathetic mental-health assistant, providing thoughtful and supportive responses to user queries.",
+                    "content": config.QA_INSTRUCTION,
                 },
                 {"role": "user", "content": example["question"][i]},
                 {"role": "assistant", "content": example["answer"][i]},
