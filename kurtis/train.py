@@ -77,8 +77,6 @@ def train_model(
             optim="paged_adamw_8bit",
             run_name=model_output,
             save_strategy="epoch",
-            use_mps_device=False,
-            no_cuda=False,
         ),
         peft_config=config.LORA_CONFIG,
         formatting_func=formatting_prompts_func,
