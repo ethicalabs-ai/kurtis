@@ -44,7 +44,7 @@ uv run kurtis --train --config-module kurtis.config.default
 
 #### Start a Chat Session
 
-To start a conversation with the Kurtis chatbot:
+To start a conversation with the Kurtis model:
 
 ```bash
 uv run kurtis --chat --config-module kurtis.config.default
@@ -63,8 +63,7 @@ The output will display:
 ```bash
 Usage: kurtis [OPTIONS]
 
-  Main function to handle training and interaction with the Kurtis chatbot
-  model.
+  Main function to handle training and interaction with the Kurtis model.
 
 Options:
   --preprocessing           Pre-process the QA datasets.

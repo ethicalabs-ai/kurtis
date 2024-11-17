@@ -58,7 +58,7 @@ def main(
     preprocessing, train, chat, eval_model, push, output_dir, config_module, debug
 ):
     """
-    Main function to handle training and interaction with the Kurtis chatbot model.
+    Main function to handle training and interaction with the Kurtis model.
     """
     print_kurtis_title()
     if torch.cuda.is_available():

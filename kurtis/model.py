@@ -14,7 +14,7 @@ nf4_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
     bnb_4bit_use_double_quant=True,
-    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_compute_dtype=torch_dtype,
 )
 
 
@@ -25,7 +25,7 @@ def load_model_and_tokenizer(
     checkpoint_name="final_merged_checkpoint",
 ):
     """
-    Load the most powerful model and tokenizer automatically, or use the model_name if provided.
+    Load the model and tokenizer automatically, or use the model_name if provided.
     """
     if not model_name:
         model_name = config.TRANSFORMERS_MODEL_PRETRAINED
