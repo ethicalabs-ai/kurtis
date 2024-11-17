@@ -47,7 +47,7 @@ DATASETS_CONFIG = {
 
 
 EVALUATION_DATASET = {
-    "name": "alexandreteles/mental-health-conversational-data",
+    "name": "Amod/mental_health_counseling_conversations",
     "text_column": "Context",
     "response_column": "Response",
     "max_samples": 500,
