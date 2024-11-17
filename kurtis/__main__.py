@@ -35,7 +35,8 @@ device = get_device()
     is_flag=True,
     help="Evaluate model.",
 )
-@click.option("--push", is_flag=True, help="Push datasets to huggingface.")
+@click.option("--push-datasets", is_flag=True, help="Push datasets to huggingface.")
+@click.option("--push-model", is_flag=True, help="Push model to huggingface.")
 @click.option(
     "--output-dir",
     "-o",
@@ -55,7 +56,15 @@ device = get_device()
     help="Enable debug mode for verbose output",
 )
 def main(
-    preprocessing, train, chat, eval_model, push, output_dir, config_module, debug
+    preprocessing,
+    train,
+    chat,
+    eval_model,
+    push_datasets,
+    push_model,
+    output_dir,
+    config_module,
+    debug,
 ):
     """
     Main function to handle training and interaction with the Kurtis model.
@@ -95,6 +104,7 @@ def main(
             config,
             output_dir=output_dir,
             model_output=model_output,
+            push=push_model,
         )
     elif chat:
         model, tokenizer = load_model_and_tokenizer(
@@ -119,8 +129,15 @@ def main(
         model.eval()
         click.echo("Testing the model on configured datasets...")
         evaluate_main(model, tokenizer, config)
-    elif push:
+    elif push_datasets:
         push_datasets_to_huggingface(config)
+    elif push_model:
+        model, _ = load_model_and_tokenizer(
+            config,
+            model_name=model_name,
+            model_output=model_output,
+        )
+        model.push_to_hub(config.HF_REPO_ID, "Upload model")
     else:
         click.echo(
             "Please provide one of the following options: --preprocessing, --train, --eval-model, --push or --chat."

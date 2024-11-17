@@ -38,7 +38,7 @@ def load_model_and_tokenizer(
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto",
-        # quantization_config=nf4_config,
+        quantization_config=nf4_config,
         torch_dtype=torch_dtype,
     )
     return model, tokenizer
