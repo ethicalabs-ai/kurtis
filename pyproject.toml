@@ -31,10 +31,12 @@ dependencies = [
     "tqdm>=4.67.0",
     "bitsandbytes>=0.44.1 ; platform_machine == 'x86_64'",
     "setuptools>=75.3.0",
+    "bitsandbytes ; sys_platform == 'darwin' and platform_machine == 'arm64'",
 ]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cu124", marker = "platform_machine == 'x86_64'"}
+bitsandbytes = { git = "https://github.com/bitsandbytes-foundation/bitsandbytes.git", branch = "multi-backend-refactor", marker = "sys_platform == 'darwin' and platform_machine == 'arm64'" }
 
 [[tool.uv.index]]
 name = "pytorch-cu124"

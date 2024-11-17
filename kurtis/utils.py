@@ -47,16 +47,14 @@ def load_config(config_module="kurtis.config.default"):
 
 
 # https://github.com/pytorch/pytorch/issues/83015
-# def get_device():
-#     return (
-#         "mps"
-#         if torch.backends.mps.is_available()
-#         else "cuda" if torch.cuda.is_available() else "cpu"
-#     )
-
-
 def get_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    return (
+        "mps"
+        if torch.backends.mps.is_available()
+        else "cuda"
+        if torch.cuda.is_available()
+        else "cpu"
+    )
 
 
 def free_unused_memory():
