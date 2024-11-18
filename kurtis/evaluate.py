@@ -24,7 +24,6 @@ def evaluate_model(
     """
     total = len(dataset)
     pbar = tqdm(total=total, desc="Evaluating model")
-    total_val_loss = 0
     model.eval()
 
     all_inputs = []
@@ -91,10 +90,9 @@ def evaluate_model(
         zero_division=0,
     )
 
-    avg_val_loss = total_val_loss / total if total > 0 else float("inf")
     if debug:
         click.echo(
-            f"Validation Loss: {avg_val_loss}, Rouge-2: {rouge_output}, Accuracy: {accuracy}, F1: {f1}, Precision: {precision}, Recall: {recall}"
+            f"Rouge-2: {rouge_output}, Accuracy: {accuracy}, F1: {f1}, Precision: {precision}, Recall: {recall}"
         )
 
     # Print some examples of questions, expected answers, and generated answers
@@ -104,7 +102,7 @@ def evaluate_model(
         click.echo(f"  Expected Answer: {all_labels[i]}")
         click.echo(f"  Generated Answer: {all_preds[i]}")
 
-    return avg_val_loss, rouge_output, accuracy, f1, precision, recall
+    return rouge_output, accuracy, f1, precision, recall
 
 
 def evaluate_main(
@@ -127,7 +125,7 @@ def evaluate_main(
 
     # Evaluate the model
     click.echo("Evaluating the model...")
-    avg_val_loss, rouge_output, accuracy, f1, precision, recall = evaluate_model(
+    rouge_output, accuracy, f1, precision, recall = evaluate_model(
         model,
         tokenizer,
         config,
@@ -138,7 +136,6 @@ def evaluate_main(
     )
 
     # Log evaluation results
-    click.echo(f"Validation Loss: {avg_val_loss}")
     click.echo(f"Rouge-2 Score: {rouge_output}")
     click.echo(f"Accuracy: {accuracy}")
     click.echo(f"F1 Score: {f1}")
@@ -147,8 +144,7 @@ def evaluate_main(
 
     # Save results to JSON
     results = {
-        "dataset": "kurtis",
-        "validation_loss": avg_val_loss,
+        "dataset": config.EVALUATION_DATASET["name"],
         "rouge_2": rouge_output,
         "accuracy": accuracy,
         "f1_score": f1,
