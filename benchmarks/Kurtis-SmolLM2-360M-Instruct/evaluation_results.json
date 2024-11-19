@@ -1,0 +1,8 @@
+{
+    "dataset": "Amod/mental_health_counseling_conversations",
+    "rouge_2": 0.029763668557571028,
+    "accuracy": 0.80455078125,
+    "f1_score": 0.8534854124042528,
+    "precision": 0.9091303098627023,
+    "recall": 0.80455078125
+}
