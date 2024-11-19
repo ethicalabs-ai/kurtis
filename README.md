@@ -70,7 +70,8 @@ Options:
   --train                   Train the model using QA datasets
   --chat                    Interact with the trained model.
   --eval-model              Evaluate model.
-  --push                    Push datasets to huggingface.
+  --push-model              Push model to huggingface.
+  --push-datasets           Push datasets to huggingface.
   -o, --output-dir TEXT     Directory to save or load the model and
                             checkpoints
   -c, --config-module TEXT  Kurtis python config module.
@@ -96,6 +97,18 @@ make docker_run     - Run the Docker container with output mounted.
 make docker_train   - Run the training script inside the Docker container.
 make docker_chat    - Start a prompt session inside the Docker container.
 ```
+
+### Evaluation Results
+
+[Evaluation Dataset](https://huggingface.co/datasets/Amod/mental_health_counseling_conversations)
+
+| Metric         | **SmolLM2-1.7B** | **SmolLM2-360M**  | **Qwen2.5-0.5B** |
+|----------------|-------------------|------------------|------------------|
+| **ROUGE-2**    | 0.0377            | 0.0298           | 0.0274           |
+| **Accuracy**   | 81.81%            | 80.46%           | 80.80%           |
+| **F1 Score**   | 86.28%            | 85.35%           | 85.45%           |
+| **Precision**  | 91.30%            | 90.91%           | 90.70%           |
+| **Recall**     | 81.81%            | 80.46%           | 80.80%           |
 
 ### License
 
