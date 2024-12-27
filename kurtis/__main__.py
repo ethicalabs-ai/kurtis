@@ -11,6 +11,7 @@ from .push import push_datasets_to_huggingface
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
+from .dpo import generate_dpo_dataset, clean_dpo_dataset
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -34,6 +35,11 @@ device = get_device()
     "--eval-model",
     is_flag=True,
     help="Evaluate model.",
+)
+@click.option(
+    "--generate-dpo",
+    is_flag=True,
+    help="Generate DPO dataset with chosen/rejected prompt pairs.",
 )
 @click.option("--push-datasets", is_flag=True, help="Push datasets to huggingface.")
 @click.option("--push-model", is_flag=True, help="Push model to huggingface.")
@@ -60,6 +66,7 @@ def main(
     train,
     chat,
     eval_model,
+    generate_dpo,
     push_datasets,
     push_model,
     output_dir,
@@ -130,6 +137,19 @@ def main(
         model.eval()
         click.echo("Testing the model on configured datasets...")
         evaluate_main(model, tokenizer, config)
+    elif generate_dpo:
+        generate_dpo_dataset(
+            "microsoft/Phi-3.5-mini-instruct",
+            os.path.join("datasets", "kurtis_mental_health", "kurtis.parquet"),
+            os.path.join("datasets", "kurtis_mental_health_dpo", "kurtis.parquet"),
+            debug=debug,
+        )
+        clean_dpo_dataset(
+            os.path.join("datasets", "kurtis_mental_health_dpo", "kurtis.parquet"),
+            os.path.join(
+                "datasets", "kurtis_mental_health_dpo", "kurtis_clean.parquet"
+            ),
+        )
     elif push_datasets:
         push_datasets_to_huggingface(config)
     elif push_model:
