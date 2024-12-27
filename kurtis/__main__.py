@@ -85,17 +85,18 @@ def main(
     os.makedirs(output_dir, exist_ok=True)
 
     model_name = config.TRANSFORMERS_MODEL_PRETRAINED
-    model_output = os.path.join(output_dir, config.MODEL_NAME)
+    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
 
     if train:
-        if os.path.exists(model_output):
-            click.echo(f"Model {model_output} has already been trained.")
+        if os.path.exists(output_merged_dir):
+            click.echo(f"Model {model_dirname} has already been fine-tuned and merged.")
             return
 
         model, tokenizer = load_model_and_tokenizer(
             config,
             model_name=model_name,
-            model_output=model_output,
+            model_output=model_dirname,
         )
         click.echo("Starting training process...")
         train_model(
@@ -103,14 +104,14 @@ def main(
             tokenizer,
             config,
             output_dir=output_dir,
-            model_output=model_output,
+            model_output=model_dirname,
             push=push_model,
         )
     elif chat:
         model, tokenizer = load_model_and_tokenizer(
             config,
             model_name=config.INFERENCE_MODEL,
-            model_output=model_output,
+            model_output=model_dirname,
         )
         model.eval()  # Set the model to evaluation mode
         click.echo("Kurtis is ready. Type 'exit' to stop.")
@@ -124,7 +125,7 @@ def main(
         model, tokenizer = load_model_and_tokenizer(
             config,
             model_name=config.INFERENCE_MODEL,
-            model_output=model_output,
+            model_output=model_dirname,
         )
         model.eval()
         click.echo("Testing the model on configured datasets...")
@@ -135,7 +136,7 @@ def main(
         model, _ = load_model_and_tokenizer(
             config,
             model_name=model_name,
-            model_output=model_output,
+            model_output=model_dirname,
         )
         model.push_to_hub(config.HF_REPO_ID, "Upload model")
     else:

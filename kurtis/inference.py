@@ -8,9 +8,10 @@ def inference_model(
     tokenizer,
     config,
     input_text,
+    instruction=None,
 ):
     """
-    Generates a response from Kurtis using the trained T5 model.
+    Generates a response from Kurtis.
 
     Args:
         model: The trained language model.
@@ -20,7 +21,8 @@ def inference_model(
     Returns:
         str: The generated response from the model or an error message.
     """
-
+    if not instruction:
+        instruction = config.QA_INSTRUCTION
     response = None
     try:
         device = get_device()
@@ -29,7 +31,7 @@ def inference_model(
         messages = [
             {
                 "role": "system",
-                "content": config.QA_INSTRUCTION,
+                "content": instruction,
             },
             {"role": "user", "content": input_text},
         ]
@@ -57,7 +59,9 @@ def inference_model(
     return response.strip() if response else fallback_response
 
 
-def batch_inference(model, tokenizer, config, input_texts, max_length=512):
+def batch_inference(
+    model, tokenizer, config, input_texts, instruction=None, max_length=512
+):
     """
     Generates responses from Kurtis for multiple input texts in a batch.
 
@@ -71,6 +75,8 @@ def batch_inference(model, tokenizer, config, input_texts, max_length=512):
     Returns:
         list: A list of generated responses from the model.
     """
+    if not instruction:
+        instruction = config.QA_INSTRUCTION
     device = get_device()
     # model.to(device)
     model.eval()
@@ -79,7 +85,7 @@ def batch_inference(model, tokenizer, config, input_texts, max_length=512):
     messages = [
         {
             "role": "system",
-            "content": config.QA_INSTRUCTION,
+            "content": instruction,
         }
     ]
     inputs = [

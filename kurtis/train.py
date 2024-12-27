@@ -50,6 +50,8 @@ def train_model(
     weight_decay = cfg.get("weight_decay", 2e-2)
     accumulation_steps = cfg.get("accumulation_steps", 8)
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
+    final_checkpoint_dir = os.path.join(model_dirname, "final_checkpoint")
 
     model = prepare_model_for_kbit_training(model)
 
@@ -77,8 +79,6 @@ def train_model(
             optim="paged_adamw_8bit",
             run_name=model_output,
             save_strategy="epoch",
-            use_mps_device=False,
-            no_cuda=False,
         ),
         peft_config=config.LORA_CONFIG,
         formatting_func=formatting_prompts_func,
@@ -91,7 +91,6 @@ def train_model(
     # Save adapter model
     # Adapted from: https://github.com/huggingface/smollm/blob/main/finetune/train.py
     model = PeftModel(model, peft_config=config.LORA_CONFIG)
-    final_checkpoint_dir = os.path.join(model_dirname, "final_checkpoint")
     trainer.save_model(final_checkpoint_dir)
     del model
     free_unused_memory()
