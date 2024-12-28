@@ -149,6 +149,7 @@ def main(
             os.path.join(
                 "datasets", "kurtis_mental_health_dpo", "kurtis_clean.parquet"
             ),
+            debug=debug,
         )
     elif push_datasets:
         push_datasets_to_huggingface(config)
