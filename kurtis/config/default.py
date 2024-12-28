@@ -59,6 +59,9 @@ FINAL_DATASETS = {
     "datasets/kurtis_mental_health_initial_v2": "mrs83/kurtis_mental_health_initial_v2",
     "datasets/kurtis_mental_health_final_v2": "mrs83/kurtis_mental_health_final_v2",
 }
+DPO_DATASETS = {
+    "datasets/kurtis_mental_health_dpo/kurtis_clean.parquet": "mrs83/kurtis_mental_health_dpo"
+}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
