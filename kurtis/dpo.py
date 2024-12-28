@@ -3,7 +3,7 @@ import re
 import torch
 import click
 from tqdm import tqdm
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 import pandas as pd
 from transformers import pipeline
 from transformers import AutoTokenizer
@@ -126,7 +126,7 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
             non_matching_entries.append(entry)
 
     # Save the matching entries to the output path
-    output_dataset = load_dataset.from_dict(
+    output_dataset = Dataset.from_dict(
         {
             "prompt": [e["prompt"] for e in matching_entries],
             "chosen": [e["chosen"] for e in matching_entries],
