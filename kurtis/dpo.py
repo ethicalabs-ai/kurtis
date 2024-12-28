@@ -105,7 +105,7 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
     dataset = load_dataset("parquet", data_files=input_path, split="train")
 
     # Regex pattern to extract text between double quotes at the start and end of the text
-    pattern = r'^"(.*?)"\n\n.*$'
+    pattern = r'^"(.*?)"\n\n(.*)$'
 
     # Separate entries matching the pattern and those that don't
     matching_entries = []
@@ -115,10 +115,12 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
         match = re.match(pattern, entry["rejected"])
         if match:
             extracted_text = match.group(1)  # Extract text between quotes
+            extracted_notes = match.group(2)  # Extract notes
             example = {
                 "prompt": entry.get("prompt", ""),
                 "chosen": entry.get("chosen", ""),
                 "rejected": extracted_text,
+                "rejected_notes": extracted_notes,
             }
             matching_entries.append(example)
             if debug:
@@ -132,6 +134,7 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
             "prompt": [e["prompt"] for e in matching_entries],
             "chosen": [e["chosen"] for e in matching_entries],
             "rejected": [e["rejected"] for e in matching_entries],
+            "rejected_notes": [e["rejected_notes"] for e in matching_entries],
         }
     )
     output_dataset.save_to_disk(output_path)
