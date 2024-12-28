@@ -115,13 +115,14 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
         match = re.match(pattern, entry["rejected"])
         if match:
             extracted_text = match.group(1)  # Extract text between quotes
-            matching_entries.append(
-                {
-                    "prompt": entry.get("prompt", ""),
-                    "chosen": entry.get("chosen", ""),
-                    "rejected": extracted_text,
-                }
-            )
+            example = {
+                "prompt": entry.get("prompt", ""),
+                "chosen": entry.get("chosen", ""),
+                "rejected": extracted_text,
+            }
+            matching_entries.append(example)
+            if debug:
+                click.echo(repr(example))
         else:
             non_matching_entries.append(entry)
 
