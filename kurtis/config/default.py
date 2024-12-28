@@ -60,7 +60,7 @@ FINAL_DATASETS = {
     "datasets/kurtis_mental_health_final_v2": "mrs83/kurtis_mental_health_final_v2",
 }
 DPO_DATASETS = {
-    "datasets/kurtis_mental_health_dpo/kurtis_clean.parquet": "mrs83/kurtis_mental_health_dpo"
+    "datasets/kurtis_mental_health_dpo/kurtis_clean": "mrs83/kurtis_mental_health_dpo"
 }
 
 LORA_CONFIG = LoraConfig(
