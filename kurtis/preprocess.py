@@ -13,9 +13,7 @@ from datasets import concatenate_datasets
 from .dataset import load_preprocessing_dataset_from_config
 from .model import load_model_and_tokenizer
 from .utils import get_device
-
-nltk.download("punkt")
-nltk.download("punkt_tab")
+from .defaults import TrainingConfig
 
 
 # Load all datasets
@@ -23,7 +21,7 @@ def load_datasets(config):
     dataset_list = []
     for ds_config in config.DATASETS_CONFIG.values():
         dataset = load_preprocessing_dataset_from_config(
-            ds_config,
+            TrainingConfig.from_dict(ds_config),
         )
         dataset_list.append(dataset)  # Assuming 'train' split
     return concatenate_datasets(dataset_list)
@@ -195,6 +193,8 @@ def preprocessing_main(
     final_dataset_name="kurtis_mental_health_final_v2",
     debug=False,
 ):
+    nltk.download("punkt")
+    nltk.download("punkt_tab")
     if not torch.cuda.is_available():
         click.echo("CUDA is required to run data augmentation on initial dataset.")
 
@@ -210,8 +210,8 @@ def preprocessing_main(
     if os.path.exists(initial_dataset_filename) and not refresh:
         initial_dataset = load_preprocessing_dataset_from_config(
             {
-                "name": f"datasets/{initial_dataset_name}",
-                "text_column": "question",
+                "dataset_name": f"datasets/{initial_dataset_name}",
+                "prompt_column": "question",
                 "response_column": "answer",
             },
         )

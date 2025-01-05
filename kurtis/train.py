@@ -7,9 +7,8 @@ from trl import SFTTrainer
 
 from .dataset import load_kurtis_dataset_from_config
 from .model import torch_dtype
-from .utils import free_unused_memory, get_device
-
-device = get_device()
+from .utils import free_unused_memory
+from .defaults import TrainingConfig
 
 
 def train_model(
@@ -41,17 +40,10 @@ def train_model(
         return output_texts
 
     # Configuration parameters
-    cfg = config.TRAINING_CONFIG
-    warmup_ratio = cfg.get("warmup_ratio", 0.03)
-    num_train_epochs = cfg.get("num_train_epochs", 3)
-    batch_size = cfg.get("batch_size", 1)
-    max_length = cfg.get("max_length", 2048)
-    lr = cfg.get("lr", 3e-4)
-    weight_decay = cfg.get("weight_decay", 2e-2)
-    accumulation_steps = cfg.get("accumulation_steps", 8)
+    cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
-    output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
-    final_checkpoint_dir = os.path.join(model_dirname, "final_checkpoint")
+    output_merged_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
+    final_checkpoint_dir = os.path.join(model_dirname, cfg.final_merged_checkpoint_name)
 
     model = prepare_model_for_kbit_training(model)
 
@@ -60,23 +52,23 @@ def train_model(
     trainer = SFTTrainer(
         model=model,
         train_dataset=train_loader,
-        max_seq_length=max_length,
+        max_seq_length=cfg.max_length,
         args=transformers.TrainingArguments(
-            per_device_train_batch_size=batch_size,
-            gradient_checkpointing=True,
-            gradient_accumulation_steps=accumulation_steps,
-            num_train_epochs=num_train_epochs,
-            learning_rate=lr,
-            lr_scheduler_type="cosine",
-            warmup_ratio=warmup_ratio,
-            max_grad_norm=1.0,
-            weight_decay=weight_decay,
-            bf16=True,
-            tf32=True,
+            per_device_train_batch_size=cfg.batch_size,
+            gradient_checkpointing=cfg.checkpointing,
+            gradient_accumulation_steps=cfg.accumulation_steps,
+            num_train_epochs=cfg.num_train_epochs,
+            learning_rate=cfg.lr,
+            lr_scheduler_type=cfg.lr_scheduler_type,
+            warmup_ratio=cfg.warmup_ratio,
+            max_grad_norm=cfg.max_grad_norm,
+            weight_decay=cfg.weight_decay,
+            bf16=cfg.bf16,
+            tf32=cfg.tf32,
             logging_strategy="steps",
-            logging_steps=10,
+            logging_steps=cfg.logging_steps,
             output_dir=model_dirname,
-            optim="paged_adamw_8bit",
+            optim=cfg.optim,
             run_name=model_output,
             save_strategy="epoch",
         ),
@@ -100,7 +92,6 @@ def train_model(
         final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
     )
     model = model.merge_and_unload()
-    output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
     model.save_pretrained(output_merged_dir, safe_serialization=True)
     if push:
         model.push_to_hub(config.HF_REPO_ID, "Upload model")

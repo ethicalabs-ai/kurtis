@@ -7,9 +7,9 @@ MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
 HF_REPO_ID = "Kurtis-SmolLM2-1.7B-Instruct"
 
 TRAINING_CONFIG = {
-    "name": "mrs83/kurtis_mental_health_final",
-    "split": "train",
-    "max_samples": 10000,
+    "dataset_name": "mrs83/kurtis_mental_health_final",
+    "dataset_split": "train",
+    "dataset_max_samples": 10000,
     "max_length": 2048,
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
@@ -20,37 +20,37 @@ TRAINING_CONFIG = {
 }
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
-        "name": "datasets/kurtis_mental_health",
-        "text_column": "Context",
+        "dataset_name": "datasets/kurtis_mental_health",
+        "prompt_column": "Context",
         "response_column": "Response",
-        "split": "train",
-        "max_samples": 4500,
+        "dataset_split": "train",
+        "dataset_max_samples": 4500,
         "max_length": 512,
     },
     "marmikpandya_mental_health": {
-        "name": "marmikpandya/mental-health",
-        "text_column": "input",
+        "dataset_name": "marmikpandya/mental-health",
+        "prompt_column": "input",
         "response_column": "output",
-        "split": "train",
-        "max_samples": 3500,
+        "dataset_split": "train",
+        "dataset_max_samples": 3500,
         "max_length": 512,
     },
     "fadodr_mental_health_therapy": {
-        "name": "fadodr/mental_health_therapy",
-        "text_column": "input",
+        "dataset_name": "fadodr/mental_health_therapy",
+        "prompt_column": "input",
         "response_column": "output",
-        "split": "train",
-        "max_samples": 3500,
+        "dataset_split": "train",
+        "dataset_max_samples": 3500,
         "max_length": 512,
     },
 }
 
 
 EVALUATION_DATASET = {
-    "name": "Amod/mental_health_counseling_conversations",
-    "text_column": "Context",
+    "dataset_name": "Amod/mental_health_counseling_conversations",
+    "prompt_column": "Context",
     "response_column": "Response",
-    "max_samples": 500,
+    "dataset_max_samples": 500,
 }
 
 
@@ -60,7 +60,7 @@ FINAL_DATASETS = {
     "datasets/kurtis_mental_health_final_v2": "mrs83/kurtis_mental_health_final_v2",
 }
 DPO_DATASETS = {
-    "datasets/kurtis_mental_health_dpo/kurtis_clean": "mrs83/kurtis_mental_health_dpo"
+    "datasets/kurtis_mental_health_dpo_clean": "mrs83/kurtis_mental_health_dpo"
 }
 
 LORA_CONFIG = LoraConfig(
