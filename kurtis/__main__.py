@@ -170,6 +170,7 @@ def handle_push_model(config, model_name, model_dirname):
 @click.command()
 @click.option("--preprocessing", is_flag=True, help="Pre-process the QA datasets.")
 @click.option("--train", is_flag=True, help="Train the model using QA datasets.")
+@click.option("--train-dpo", is_flag=True, help="Train the model using DPO.")
 @click.option("--chat", is_flag=True, help="Interact with the trained model.")
 @click.option("--eval-model", is_flag=True, help="Evaluate the model.")
 @click.option("--generate-dpo", is_flag=True, help="Generate and clean DPO dataset.")
