@@ -11,7 +11,6 @@ from .dataset import load_preprocessing_dataset_from_config
 from .inference import batch_inference
 from .utils import get_device
 
-rouge = evaluate.load("rouge")
 device = get_device()
 
 
@@ -22,6 +21,7 @@ def evaluate_model(
     Evaluate the model on the validation set with attention masks.
     Returns: Average validation loss, Rouge score, accuracy, F1, precision, recall.
     """
+    rouge = evaluate.load("rouge")
     total = len(dataset)
     pbar = tqdm(total=total, desc="Evaluating model")
     model.eval()
@@ -144,7 +144,7 @@ def evaluate_main(
 
     # Save results to JSON
     results = {
-        "dataset": config.EVALUATION_DATASET["name"],
+        "dataset": config.EVALUATION_DATASET["dataset_name"],
         "rouge_2": rouge_output,
         "accuracy": accuracy,
         "f1_score": f1,

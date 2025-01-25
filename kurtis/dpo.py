@@ -7,6 +7,11 @@ from datasets import load_dataset, Dataset
 import pandas as pd
 from transformers import pipeline
 from transformers import AutoTokenizer
+from trl import DPOTrainer, DPOConfig
+from peft import PeftModel, prepare_model_for_kbit_training
+
+from .utils import free_unused_memory
+from .defaults import TrainingConfig
 
 
 def generate_rejected_prompt(prompt: str, pipe, max_new_tokens=256, debug=False):
@@ -43,6 +48,7 @@ def generate_rejected_prompt(prompt: str, pipe, max_new_tokens=256, debug=False)
         top_p=0.9,  # Include top probable tokens for coherent generation
         repetition_penalty=1.2,  # Penalize repetitive patterns
         early_stopping=True,  # Stop at the first end-of-sequence token
+        do_sample=True,
     )
     rejected = outputs[0]["generated_text"][-1]
     content = re.sub(r'^\s*"(.*?)"\s*$', r"\1", rejected["content"].strip())
@@ -90,7 +96,7 @@ def generate_dpo_dataset(
     click.echo(f"Processed dataset saved to {output_path}")
 
 
-def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=False):
+def clean_dpo_dataset(input_path: str, output_path: str, debug=False):
     """
     This function cleans a DPO dataset by leveraging the specific behavior of the model.
 
@@ -99,7 +105,7 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
     warning the user about the toxic reply.
 
     We can assume that the generated text with such a note is classified as toxic.
-    For other samples, a classifier is used to detect if the content is toxic or not.
+    For other samples, a classifier can be used to detect if the content is toxic or not.
     """
     # Load the dataset from the parquet file
     dataset = load_dataset("parquet", data_files=input_path, split="train")
@@ -146,3 +152,55 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False, force=Fals
         )
 
     return non_matching_entries
+
+
+def train_dpo_model(
+    model, tokenizer, config, dataset, output_dir, model_output, push=False
+):
+    cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
+    model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
+    final_checkpoint_dir = os.path.join(
+        model_dirname, cfg.dpo_final_merged_checkpoint_name
+    )
+
+    model = prepare_model_for_kbit_training(model)
+
+    dpo_config = DPOConfig(
+        beta=0.1,
+        per_device_train_batch_size=cfg.batch_size,
+        gradient_checkpointing=cfg.checkpointing,
+        gradient_accumulation_steps=cfg.accumulation_steps,
+        num_train_epochs=cfg.num_train_epochs,
+        learning_rate=cfg.lr,
+        lr_scheduler_type=cfg.lr_scheduler_type,
+        warmup_ratio=cfg.warmup_ratio,
+        max_grad_norm=cfg.max_grad_norm,
+        weight_decay=cfg.weight_decay,
+        bf16=cfg.bf16,
+        tf32=cfg.tf32,
+        logging_strategy="steps",
+        logging_steps=cfg.logging_steps,
+        output_dir=model_dirname,
+        optim=cfg.optim,
+        run_name=model_output,
+        save_strategy="epoch",
+    )
+    trainer = DPOTrainer(
+        model=model,
+        tokenizer=tokenizer,
+        train_dataset=dataset,
+        args=dpo_config,
+        peft_config=config.LORA_CONFIG,
+    )
+    # launch
+    click.echo("Training...")
+    trainer.train()
+
+    # Save adapter model
+    model = PeftModel(model, peft_config=config.LORA_CONFIG)
+    trainer.save_model(final_checkpoint_dir)
+    if push:
+        model.push_to_hub(f"{config.HF_DPO_REPO_ID}-PEFT", "Upload DPO adapter")
+    del model
+    free_unused_memory()
+    click.echo(f"DPO model saved to {final_checkpoint_dir}")
