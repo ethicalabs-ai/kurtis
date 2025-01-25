@@ -64,7 +64,9 @@ device = get_device()
     default=False,
     help="Enable debug mode for verbose output",
 )
+@click.pass_context
 def main(
+    ctx,
     preprocessing,
     train,
     chat,
@@ -165,9 +167,8 @@ def main(
         )
         model.push_to_hub(config.HF_REPO_ID, "Upload model")
     else:
-        click.echo(
-            "Please provide one of the following options: --preprocessing, --train, --eval-model, --push or --chat."
-        )
+        click.echo(ctx.get_help())
+        ctx.exit()
 
 
 if __name__ == "__main__":
