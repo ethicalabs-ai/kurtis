@@ -1,5 +1,4 @@
 import os
-
 import click
 import torch
 
@@ -19,38 +18,136 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 device = get_device()
 
 
+def handle_preprocessing(config, debug):
+    """
+    Handle data preprocessing tasks.
+    """
+    preprocessing_main(config, debug=debug)
+
+
+def handle_train(
+    config, model_name, model_dirname, output_merged_dir, output_dir, push_model
+):
+    """
+    Train and optionally push the model to Hugging Face if specified.
+    """
+    if os.path.exists(output_merged_dir):
+        click.echo(f"Model {model_dirname} has already been fine-tuned and merged.")
+        return
+
+    model, tokenizer = load_model_and_tokenizer(
+        config,
+        model_name=model_name,
+        model_output=model_dirname,
+    )
+    click.echo("Starting training process...")
+    train_model(
+        model,
+        tokenizer,
+        config,
+        output_dir=output_dir,
+        model_output=model_dirname,
+        push=push_model,
+    )
+
+
+def handle_chat(config, model_dirname):
+    """
+    Launch an interactive chat session with the model.
+    """
+    model, tokenizer = load_model_and_tokenizer(
+        config,
+        model_name=config.INFERENCE_MODEL,
+        model_output=model_dirname,
+    )
+    model.eval()  # Set the model to evaluation mode
+    click.echo("Kurtis is ready. Type 'exit' to stop.")
+    start_chat_wrapper(
+        model,
+        tokenizer,
+        config,
+        inference_model,
+    )
+
+
+def handle_evaluation(config, model_dirname):
+    """
+    Evaluate the model on configured datasets.
+    """
+    model, tokenizer = load_model_and_tokenizer(
+        config,
+        model_name=config.INFERENCE_MODEL,
+        model_output=model_dirname,
+    )
+    model.eval()
+    click.echo("Testing the model on configured datasets...")
+    evaluate_main(model, tokenizer, config)
+
+
+def handle_generate_dpo(debug=False):
+    """
+    Generate and clean a DPO dataset.
+    """
+    base_model = "microsoft/Phi-3.5-mini-instruct"
+    source_path = os.path.join("datasets", "kurtis_mental_health", "kurtis.parquet")
+    target_path = os.path.join("datasets", "kurtis_mental_health_dpo")
+    clean_path = os.path.join("datasets", "kurtis_mental_health_dpo_clean")
+
+    generate_dpo_dataset(
+        base_model,
+        source_path,
+        target_path,
+        debug=debug,
+    )
+    clean_dpo_dataset(
+        target_path,
+        clean_path,
+        debug=debug,
+    )
+
+
+def handle_push_datasets(config):
+    """
+    Push standard datasets to Hugging Face.
+    """
+    push_datasets_to_huggingface(config)
+
+
+def handle_push_dpo_datasets(config):
+    """
+    Push DPO datasets to Hugging Face.
+    """
+    push_dpo_datasets_to_huggingface(config)
+
+
+def handle_push_model(config, model_name, model_dirname):
+    """
+    Push a trained model to Hugging Face.
+    """
+    model, _ = load_model_and_tokenizer(
+        config,
+        model_name=model_name,
+        model_output=model_dirname,
+    )
+    model.push_to_hub(config.HF_REPO_ID, "Upload model")
+
+
 @click.command()
-@click.option(
-    "--preprocessing",
-    is_flag=True,
-    help="Pre-process the QA datasets.",
-)
-@click.option(
-    "--train",
-    is_flag=True,
-    help="Train the model using QA datasets",
-)
+@click.option("--preprocessing", is_flag=True, help="Pre-process the QA datasets.")
+@click.option("--train", is_flag=True, help="Train the model using QA datasets.")
 @click.option("--chat", is_flag=True, help="Interact with the trained model.")
+@click.option("--eval-model", is_flag=True, help="Evaluate the model.")
+@click.option("--generate-dpo", is_flag=True, help="Generate and clean DPO dataset.")
+@click.option("--push-datasets", is_flag=True, help="Push datasets to Hugging Face.")
 @click.option(
-    "--eval-model",
-    is_flag=True,
-    help="Evaluate model.",
+    "--push-dpo-datasets", is_flag=True, help="Push DPO datasets to Hugging Face."
 )
-@click.option(
-    "--generate-dpo",
-    is_flag=True,
-    help="Generate DPO dataset with chosen/rejected prompt pairs.",
-)
-@click.option("--push-datasets", is_flag=True, help="Push datasets to huggingface.")
-@click.option(
-    "--push-dpo-datasets", is_flag=True, help="Push DPO datasets to huggingface."
-)
-@click.option("--push-model", is_flag=True, help="Push model to huggingface.")
+@click.option("--push-model", is_flag=True, help="Push model to Hugging Face.")
 @click.option(
     "--output-dir",
     "-o",
     default="./output",
-    help="Directory to save or load the model and checkpoints",
+    help="Directory to save or load the model and checkpoints.",
 )
 @click.option(
     "--config-module",
@@ -62,7 +159,7 @@ device = get_device()
     "--debug",
     is_flag=True,
     default=False,
-    help="Enable debug mode for verbose output",
+    help="Enable debug mode for verbose output.",
 )
 @click.pass_context
 def main(
@@ -80,93 +177,62 @@ def main(
     debug,
 ):
     """
-    Main function to handle training and interaction with the Kurtis model.
+    Main command for managing the Kurtis model:
+    - Preprocess data
+    - Train
+    - Chat interactively
+    - Evaluate
+    - Generate DPO data
+    - Push datasets or model to Hugging Face
     """
     print_kurtis_title()
+
     if torch.cuda.is_available():
-        click.echo("Running on GPU: " + torch.cuda.get_device_name(0))
+        click.echo(f"Running on GPU: {torch.cuda.get_device_name(0)}")
+
+    # Load config
     config = load_config(config_module)
     if config is None:
         click.echo(f"Unable to import config module: {config_module}")
-        return
+        ctx.exit(1)
 
+    # Handle preprocessing early return
     if preprocessing:
-        preprocessing_main(config, debug=debug)
+        handle_preprocessing(config, debug)
         return
 
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
+    # Common model paths
     model_name = config.TRANSFORMERS_MODEL_PRETRAINED
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
     output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
 
+    # Process each flag
     if train:
-        if os.path.exists(output_merged_dir):
-            click.echo(f"Model {model_dirname} has already been fine-tuned and merged.")
-            return
-
-        model, tokenizer = load_model_and_tokenizer(
+        handle_train(
             config,
-            model_name=model_name,
-            model_output=model_dirname,
-        )
-        click.echo("Starting training process...")
-        train_model(
-            model,
-            tokenizer,
-            config,
-            output_dir=output_dir,
-            model_output=model_dirname,
-            push=push_model,
+            model_name,
+            model_dirname,
+            output_merged_dir,
+            output_dir,
+            push_model,
         )
     elif chat:
-        model, tokenizer = load_model_and_tokenizer(
-            config,
-            model_name=config.INFERENCE_MODEL,
-            model_output=model_dirname,
-        )
-        model.eval()  # Set the model to evaluation mode
-        click.echo("Kurtis is ready. Type 'exit' to stop.")
-        start_chat_wrapper(
-            model,
-            tokenizer,
-            config,
-            inference_model,
-        )
+        handle_chat(config, model_dirname)
     elif eval_model:
-        model, tokenizer = load_model_and_tokenizer(
-            config,
-            model_name=config.INFERENCE_MODEL,
-            model_output=model_dirname,
-        )
-        model.eval()
-        click.echo("Testing the model on configured datasets...")
-        evaluate_main(model, tokenizer, config)
+        handle_evaluation(config, model_dirname)
     elif generate_dpo:
-        generate_dpo_dataset(
-            "microsoft/Phi-3.5-mini-instruct",
-            os.path.join("datasets", "kurtis_mental_health", "kurtis.parquet"),
-            os.path.join("datasets", "kurtis_mental_health_dpo"),
-            debug=debug,
-        )
-        clean_dpo_dataset(
-            os.path.join("datasets", "kurtis_mental_health_dpo"),
-            os.path.join("datasets", "kurtis_mental_health_dpo_clean"),
-            debug=debug,
-        )
+        handle_generate_dpo(debug=debug)
     elif push_datasets:
-        push_datasets_to_huggingface(config)
+        handle_push_datasets(config)
     elif push_dpo_datasets:
-        push_dpo_datasets_to_huggingface(config)
+        handle_push_dpo_datasets(config)
     elif push_model:
-        model, _ = load_model_and_tokenizer(
-            config,
-            model_name=model_name,
-            model_output=model_dirname,
-        )
-        model.push_to_hub(config.HF_REPO_ID, "Upload model")
+        handle_push_model(config, model_name, model_dirname)
     else:
+        # If no option was provided, show help
         click.echo(ctx.get_help())
         ctx.exit()
 
