@@ -12,7 +12,7 @@ HF_DPO_REPO_ID = "mrs83/Kurtis-Qwen2.5-0.5B-Instruct-DPO"
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
     r=12,
-    lora_alpha=20,
+    lora_alpha=24,
     lora_dropout=0.05,
     target_modules=[
         "down_proj",
