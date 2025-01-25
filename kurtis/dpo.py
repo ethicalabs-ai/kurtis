@@ -191,7 +191,7 @@ def train_dpo_model(
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
-        dpo_config=dpo_config,
+        args=dpo_config,
     )
     # launch
     click.echo("Training...")
@@ -210,6 +210,6 @@ def train_dpo_model(
     model = model.merge_and_unload()
     model.save_pretrained(output_merged_dir, safe_serialization=True)
     if push:
-        model.push_to_hub(config.HF_REPO_ID, "Upload DPO model")
+        model.push_to_hub(config.HF_DPO_REPO_ID, "Upload DPO model")
 
     click.echo(f"DPO model saved to {output_merged_dir}")
