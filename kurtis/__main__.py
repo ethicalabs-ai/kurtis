@@ -40,7 +40,7 @@ def handle_train(
     model, tokenizer = load_model_and_tokenizer(
         config,
         model_name=model_name,
-        model_output=model_dirname,
+        model_output=None,
     )
     click.echo("Starting training process...")
     train_model(
