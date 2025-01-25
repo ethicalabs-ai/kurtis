@@ -65,8 +65,8 @@ def handle_train_dpo(config, output_dir, push_model):
         return
     train_dataset = raw_datasets["train"]
 
-    model_name = config.HF_REPO_ID
-    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    model_name = config.TRANSFORMERS_MODEL_PRETRAINED
+    model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
     click.echo("Loading model and tokenizer for DPO training...")
     model, tokenizer = load_model_and_tokenizer(
         config,

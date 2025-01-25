@@ -8,9 +8,8 @@ import pandas as pd
 from transformers import pipeline
 from transformers import AutoTokenizer
 from trl import DPOTrainer, DPOConfig
-from peft import AutoPeftModelForCausalLM, PeftModel, prepare_model_for_kbit_training
+from peft import PeftModel, prepare_model_for_kbit_training
 
-from .model import torch_dtype
 from .utils import free_unused_memory
 from .defaults import TrainingConfig
 
@@ -160,7 +159,6 @@ def train_dpo_model(
 ):
     cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
-    output_merged_dir = os.path.join(model_dirname, cfg.dpo_final_checkpoint_name)
     final_checkpoint_dir = os.path.join(
         model_dirname, cfg.dpo_final_merged_checkpoint_name
     )
@@ -204,14 +202,4 @@ def train_dpo_model(
         model.push_to_hub(f"{config.HF_DPO_REPO_ID}-PEFT", "Upload DPO adapter")
     del model
     free_unused_memory()
-
-    # Save final model
-    model = AutoPeftModelForCausalLM.from_pretrained(
-        final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
-    )
-    model = model.merge_and_unload()
-    model.save_pretrained(output_merged_dir, safe_serialization=True)
-    if push:
-        model.push_to_hub(config.HF_DPO_REPO_ID, "Upload DPO model")
-
-    click.echo(f"DPO model saved to {output_merged_dir}")
+    click.echo(f"DPO model saved to {final_checkpoint_dir}")
