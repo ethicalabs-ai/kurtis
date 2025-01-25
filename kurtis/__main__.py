@@ -11,9 +11,7 @@ from .push import push_datasets_to_huggingface, push_dpo_datasets_to_huggingface
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
-from .dpo import (
-    generate_prompt_injection_dpo_dataset,
-)
+from .dpo import generate_dpo_dataset, clean_dpo_dataset
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -144,22 +142,17 @@ def main(
         click.echo("Testing the model on configured datasets...")
         evaluate_main(model, tokenizer, config)
     elif generate_dpo:
-        generate_prompt_injection_dpo_dataset(
-            "Qwen/Qwen2.5-0.5B-Instruct",  # "rejected" model
-            os.path.join("datasets", "kurtis_prompt_injection_dpo"),
+        generate_dpo_dataset(
+            "microsoft/Phi-3.5-mini-instruct",
+            os.path.join("datasets", "kurtis_mental_health", "kurtis.parquet"),
+            os.path.join("datasets", "kurtis_mental_health_dpo"),
             debug=debug,
         )
-        # generate_dpo_dataset(
-        #     "microsoft/Phi-3.5-mini-instruct",
-        #     os.path.join("datasets", "kurtis_mental_health", "kurtis.parquet"),
-        #     os.path.join("datasets", "kurtis_mental_health_dpo"),
-        #     debug=debug,
-        # )
-        # clean_dpo_dataset(
-        #     os.path.join("datasets", "kurtis_mental_health_dpo"),
-        #     os.path.join("datasets", "kurtis_mental_health_dpo_clean"),
-        #     debug=debug,
-        # )
+        clean_dpo_dataset(
+            os.path.join("datasets", "kurtis_mental_health_dpo"),
+            os.path.join("datasets", "kurtis_mental_health_dpo_clean"),
+            debug=debug,
+        )
     elif push_datasets:
         push_datasets_to_huggingface(config)
     elif push_dpo_datasets:

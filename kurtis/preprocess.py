@@ -64,7 +64,7 @@ def generate_summary(text, model, tokenizer, debug=False):
     )
     outputs = model.generate(
         inputs,
-        max_length=256,
+        max_length=512,
         min_length=16,
         num_beams=6,
         length_penalty=1.2,
