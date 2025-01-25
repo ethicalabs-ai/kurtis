@@ -2,6 +2,8 @@ import os
 import click
 import torch
 
+from datasets import load_dataset
+
 from .evaluate import evaluate_main
 from .inference import inference_model
 from .model import load_model_and_tokenizer
@@ -10,7 +12,7 @@ from .push import push_datasets_to_huggingface, push_dpo_datasets_to_huggingface
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
-from .dpo import generate_dpo_dataset, clean_dpo_dataset
+from .dpo import generate_dpo_dataset, clean_dpo_dataset, train_dpo_model
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -46,6 +48,39 @@ def handle_train(
         tokenizer,
         config,
         output_dir=output_dir,
+        model_output=model_dirname,
+        push=push_model,
+    )
+
+
+def handle_train_dpo(config, output_dir, push_model):
+    """
+    Handle the DPO model training process, including loading data,
+    training, and optional pushing to Hugging Face.
+    """
+    # You can load or prepare your DPO dataset here.
+    raw_datasets = load_dataset(config.DPO_DATASET_NAME)
+    if "train" not in raw_datasets:
+        click.echo("No 'train' split found in dpo dataset.")
+        return
+    train_dataset = raw_datasets["train"]
+
+    model_name = config.TRANSFORMERS_MODEL_PRETRAINED
+    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    click.echo("Loading model and tokenizer for DPO training...")
+    model, tokenizer = load_model_and_tokenizer(
+        config,
+        model_name=model_name,
+        model_output=model_dirname,
+    )
+
+    click.echo("Starting DPO training process...")
+    train_dpo_model(
+        model,
+        tokenizer,
+        config,
+        train_dataset,
+        output_dir,
         model_output=model_dirname,
         push=push_model,
     )
@@ -166,6 +201,7 @@ def main(
     ctx,
     preprocessing,
     train,
+    train_dpo,
     chat,
     eval_model,
     generate_dpo,
@@ -219,6 +255,8 @@ def main(
             output_dir,
             push_model,
         )
+    elif train_dpo:
+        handle_train_dpo(config, output_dir, push_model)
     elif chat:
         handle_chat(config, model_dirname)
     elif eval_model:

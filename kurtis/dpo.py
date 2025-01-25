@@ -158,8 +158,8 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False):
 def train_dpo_model(
     model, tokenizer, config, dataset, output_dir, model_output, push=False
 ):
-    cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
-    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
+    model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
     output_merged_dir = os.path.join(model_dirname, cfg.dpo_final_checkpoint_name)
     final_checkpoint_dir = os.path.join(
         model_dirname, cfg.dpo_final_merged_checkpoint_name
