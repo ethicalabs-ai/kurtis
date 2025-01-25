@@ -71,7 +71,6 @@ def handle_train_dpo(config, output_dir, push_model):
     model, tokenizer = load_model_and_tokenizer(
         config,
         model_name=model_name,
-        model_output=model_dirname,
     )
 
     click.echo("Starting DPO training process...")
