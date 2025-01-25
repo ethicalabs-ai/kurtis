@@ -5,7 +5,7 @@ DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "mrs83/Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
-HF_REPO_ID = "Kurtis-SmolLM2-1.7B-Instruct"
+HF_REPO_ID = "mrs83/Kurtis-SmolLM2-1.7B-Instruct"
 HF_DPO_REPO_ID = "mrs83/Kurtis-SmolLM2-1.7B-Instruct-DPO"
 DPO_DATASET_NAME = "mrs83/kurtis_mental_health_dpo"
 
