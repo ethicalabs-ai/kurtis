@@ -190,6 +190,7 @@ def train_dpo_model(
         tokenizer=tokenizer,
         train_dataset=dataset,
         args=dpo_config,
+        peft_config=config.LORA_CONFIG,
     )
     # launch
     click.echo("Training...")
