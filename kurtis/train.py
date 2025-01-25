@@ -84,6 +84,8 @@ def train_model(
     # Adapted from: https://github.com/huggingface/smollm/blob/main/finetune/train.py
     model = PeftModel(model, peft_config=config.LORA_CONFIG)
     trainer.save_model(final_checkpoint_dir)
+    if push:
+        model.push_to_hub(f"{config.HF_REPO_ID}-PEFT", "Upload adapter")
     del model
     free_unused_memory()
 

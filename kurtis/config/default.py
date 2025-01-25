@@ -17,7 +17,7 @@ TRAINING_CONFIG = {
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
     "batch_size": 8,
-    "lr": 3e-4,
+    "lr": 5e-5,
     "accumulation_steps": 1,
     "weight_decay": 2e-2,
 }
@@ -75,11 +75,20 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=32,
-    lora_alpha=64,
+    r=16,
+    lora_alpha=32,
     lora_dropout=0.05,
-    target_modules=["q_proj", "v_proj"],
+    target_modules=[
+        "down_proj",
+        "gate_proj",
+        "up_proj",
+        "k_proj",
+        "o_proj",
+        "q_proj",
+        "v_proj",
+    ],
     bias="none",
+    use_dora=True,
 )
 
 QA_INSTRUCTION = "You are a compassionate and empathetic mental-health assistant, providing thoughtful and supportive responses to user queries."

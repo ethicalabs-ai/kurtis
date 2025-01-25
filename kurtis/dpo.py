@@ -200,6 +200,8 @@ def train_dpo_model(
     # Save adapter model
     model = PeftModel(model, peft_config=config.LORA_CONFIG)
     trainer.save_model(final_checkpoint_dir)
+    if push:
+        model.push_to_hub(f"{config.HF_DPO_REPO_ID}-PEFT", "Upload DPO adapter")
     del model
     free_unused_memory()
 
