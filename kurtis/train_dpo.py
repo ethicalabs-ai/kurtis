@@ -3,7 +3,7 @@ import re
 import torch
 import click
 from tqdm import tqdm
-from datasets import load_dataset, Dataset
+from datasets import load_dataset
 import pandas as pd
 from transformers import pipeline
 from transformers import AutoTokenizer
@@ -94,64 +94,6 @@ def generate_dpo_dataset(
     os.makedirs(output_dirname, exist_ok=True)
     df.to_parquet(output_path, index=False)
     click.echo(f"Processed dataset saved to {output_path}")
-
-
-def clean_dpo_dataset(input_path: str, output_path: str, debug=False):
-    """
-    This function cleans a DPO dataset by leveraging the specific behavior of the model.
-
-    microsoft/Phi-3.5-mini-instruct is particularly good at generating adversarial text.
-    In some circumstances, it adds a note at the end of the generated adversarial prompt reply,
-    warning the user about the toxic reply.
-
-    We can assume that the generated text with such a note is classified as toxic.
-    For other samples, a classifier can be used to detect if the content is toxic or not.
-    """
-    # Load the dataset from the parquet file
-    dataset = load_dataset("parquet", data_files=input_path, split="train")
-
-    # Regex pattern to extract text between double quotes at the start and end of the text
-    pattern = r'^"(.*?)"\n\n(.*)$'
-
-    # Separate entries matching the pattern and those that don't
-    matching_entries = []
-    non_matching_entries = []
-
-    for entry in dataset:
-        match = re.match(pattern, entry["rejected"])
-        if match:
-            extracted_text = match.group(1)  # Extract text between quotes
-            extracted_notes = match.group(2)  # Extract notes
-            example = {
-                "prompt": entry.get("prompt", ""),
-                "chosen": entry.get("chosen", ""),
-                "rejected": extracted_text,
-                "rejected_notes": extracted_notes,
-            }
-            matching_entries.append(example)
-            if debug:
-                click.echo(repr(example))
-        else:
-            non_matching_entries.append(entry)
-
-    # Save the matching entries to the output path
-    output_dataset = Dataset.from_dict(
-        {
-            "prompt": [e["prompt"] for e in matching_entries],
-            "chosen": [e["chosen"] for e in matching_entries],
-            "rejected": [e["rejected"] for e in matching_entries],
-            "rejected_notes": [e["rejected_notes"] for e in matching_entries],
-        }
-    )
-    output_dataset.save_to_disk(output_path)
-
-    if debug:
-        print(f"Saved {len(matching_entries)} matching entries to {output_path}")
-        print(
-            f"Kept {len(non_matching_entries)} non-matching entries for further processing."
-        )
-
-    return non_matching_entries
 
 
 def train_dpo_model(

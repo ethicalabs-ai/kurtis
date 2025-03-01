@@ -12,7 +12,7 @@ from .push import push_datasets_to_huggingface, push_dpo_datasets_to_huggingface
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
-from .dpo import generate_dpo_dataset, clean_dpo_dataset, train_dpo_model
+from .train_dpo import generate_dpo_dataset, clean_dpo_dataset, train_dpo_model
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

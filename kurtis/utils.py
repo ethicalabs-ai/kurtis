@@ -1,5 +1,9 @@
+# kurtis/utils.py
+
 import gc
 import importlib
+from types import ModuleType
+from typing import Optional, Tuple
 
 import click
 import pyfiglet
@@ -7,26 +11,43 @@ import torch
 from rich.console import Console
 from rich.panel import Panel
 from rich.style import Style
-from rich.text import Text
 
 
-def print_kurtis_title():
-    console = Console()
-    title = pyfiglet.figlet_format("Kurtis", font="banner3-D")
-    model_details = Text("Kurtis v0.1.0")
+def get_kurtis_title() -> Tuple[str, str]:
+    """
+    Returns the ASCII art title and panel text for Kurtis.
 
+    Returns:
+        tuple: (title_art (str), panel_text (str))
+    """
+    title_art: str = pyfiglet.figlet_format("Kurtis", font="banner3-D")
+    panel_text: str = "Kurtis v0.1.0"
+    return title_art, panel_text
+
+
+def print_kurtis_title(console: Optional[Console] = None) -> None:
+    """
+    Prints the Kurtis title and panel using Rich.
+
+    Args:
+        console (Console, optional): A Rich Console instance. If not provided,
+                                     a new Console will be created.
+    """
+    if console is None:
+        console = Console()
+    title_art, panel_text = get_kurtis_title()
     panel = Panel.fit(
-        model_details,
+        panel_text,
         border_style="bright_green",
         padding=(1, 4),
     )
     console.print("\n")
-    console.print(title, style=Style(color="green"), justify="center")
+    console.print(title_art, style=Style(color="green"), justify="center")
     console.print(panel, justify="center")
     console.print("\n")
 
 
-def load_config(config_module="kurtis.config.default"):
+def load_config(config_module: str = "kurtis.config.default") -> Optional[ModuleType]:
     """
     Load a custom configuration module.
 
@@ -35,33 +56,30 @@ def load_config(config_module="kurtis.config.default"):
                              Defaults to 'kurtis.config.default'.
 
     Returns:
-        module: The loaded configuration module.
+        ModuleType or None: The loaded configuration module, or None if an error occurs.
     """
     try:
         # Dynamically import the specified module
-        config = importlib.import_module(config_module)
+        config: ModuleType = importlib.import_module(config_module)
         return config
     except ImportError as e:
         click.echo(f"Error loading configuration module '{config_module}': {e}")
         return None
 
 
-# https://github.com/pytorch/pytorch/issues/83015
-# def get_device():
-#     return (
-#         "mps"
-#         if torch.backends.mps.is_available()
-#         else "cuda" if torch.cuda.is_available() else "cpu"
-#     )
+def get_device() -> str:
+    """
+    Returns the device to use based on CUDA availability.
 
-
-def get_device():
+    Returns:
+        str: "cuda" if CUDA is available, otherwise "cpu".
+    """
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def free_unused_memory():
+def free_unused_memory() -> None:
     """
-    Frees unused memory in PyTorch, managing both CPU and GPU environments safely.
+    Frees unused memory in PyTorch, handling both GPU and CPU environments.
     """
     if torch.cuda.is_available() and torch.backends.cuda.is_built():
         torch.cuda.empty_cache()
@@ -69,6 +87,4 @@ def free_unused_memory():
             torch.cuda.ipc_collect()
         except AttributeError:
             pass
-    else:
-        pass
     gc.collect()
