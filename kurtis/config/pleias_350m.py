@@ -26,3 +26,4 @@ LORA_CONFIG = LoraConfig(
     bias="none",
     use_dora=True,
 )
+CHAT_TEMPLATE = """{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are an helpful and empathetic mental-health AI assistant named Kurtis, trained by ethicalabs.ai<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"""

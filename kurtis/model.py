@@ -58,6 +58,8 @@ def load_model_and_tokenizer(
         getattr(config, "TRANSFORMERS_MODEL_PRETRAINED")
     )
     tokenizer.pad_token = tokenizer.eos_token
+    if not tokenizer.chat_template:
+        tokenizer.chat_template = config.CHAT_TEMPLATE
     model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto",
