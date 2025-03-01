@@ -2,13 +2,13 @@ from .default import *  # noqa: F403
 from peft import LoraConfig, TaskType
 
 
-TRANSFORMERS_MODEL_PRETRAINED = "PleIAs/Pleias-350m-Preview"
+TRANSFORMERS_MODEL_PRETRAINED = "PleIAs/Pleias-Pico"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
-INFERENCE_MODEL = "ethicalabs-ai/Kurtis-Pleias-350m-Instruct"
-MODEL_NAME = "Kurtis-Pleias-350m-Instruct"
-MODEL_DPO_NAME = "Kurtis-Pleias-350m-Instruct-DPO"
-HF_REPO_ID = "ethicalabs-ai/Kurtis-Pleias-350m-Instruct"
-HF_DPO_REPO_ID = "ethicalabs-ai/Kurtis-Pleias-350m-Instruct-DPO"
+INFERENCE_MODEL = "ethicalabs-ai/Kurtis-Pleias-Pico-Instruct"
+MODEL_NAME = "Kurtis-Pleias-Pico-Instruct"
+MODEL_DPO_NAME = "Kurtis-Pleias-Pico-Instruct-DPO"
+HF_REPO_ID = "ethicalabs-ai/Kurtis-Pleias-Pico-Instruct"
+HF_DPO_REPO_ID = "ethicalabs-ai/Kurtis-Pleias-Pico-Instruct-DPO"
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
     r=8,
