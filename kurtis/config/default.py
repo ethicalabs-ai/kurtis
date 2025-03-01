@@ -92,3 +92,4 @@ LORA_CONFIG = LoraConfig(
 )
 
 QA_INSTRUCTION = "You are a compassionate and empathetic mental-health assistant, providing thoughtful and supportive responses to user queries."
+CHAT_TEMPLATE = "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a compassionate and empathetic mental-health assistant named Kurtis, trained by ethicalabs.ai.\nYou provide thoughtful and supportive responses to user queries.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
