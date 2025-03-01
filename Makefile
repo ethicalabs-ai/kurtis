@@ -7,7 +7,7 @@ PYTHON = python3
 MODULE = kurtis
 OUTPUT_DIR = output
 IMAGE_NAME = kurtis:latest
-DOCKER_REGISTRY = mrs83/kurtis
+DOCKER_REGISTRY = ethicalabs/kurtis
 CONFIG_MODULE = kurtis.config.default
 
 # Default target
