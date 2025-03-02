@@ -158,12 +158,13 @@ def handle_push_model(config, model_name, model_dirname):
     """
     Push a trained model to Hugging Face.
     """
-    model, _ = load_model_and_tokenizer(
+    model, tokenizer = load_model_and_tokenizer(
         config,
         model_name=model_name,
         model_output=model_dirname,
     )
     model.push_to_hub(config.HF_REPO_ID, "Upload model")
+    tokenizer.push_to_hub(config.HF_REPO_ID, "Upload tokenizer")
 
 
 @click.command()
