@@ -64,6 +64,8 @@ def handle_train_dpo(config, output_dir, push_model):
         click.echo("No 'train' split found in dpo dataset.")
         return
     train_dataset = raw_datasets["train"]
+    if config.dataset_max_samples:
+        train_dataset = train_dataset.select(range(config.dataset_max_samples))
 
     model_name = config.HF_REPO_ID
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
