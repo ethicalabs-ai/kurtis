@@ -97,5 +97,6 @@ def train_model(
     model.save_pretrained(output_merged_dir, safe_serialization=True)
     if push:
         model.push_to_hub(config.HF_REPO_ID, "Upload model")
+        tokenizer.push_to_hub(config.HF_REPO_ID, "Upload tokenizer")
 
     click.echo(f"Model saved to {output_merged_dir}")
