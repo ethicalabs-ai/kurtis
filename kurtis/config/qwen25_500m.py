@@ -26,3 +26,25 @@ LORA_CONFIG = LoraConfig(
     bias="none",
     use_dora=True,
 )
+TRAINING_CONFIG = {
+    "dataset_name": "mrs83/kurtis_mental_health_final",
+    "dataset_split": "train",
+    "dataset_max_samples": 10000,
+    "max_length": 2048,
+    "num_train_epochs": 2,
+    "warmup_ratio": 0.2,
+    "batch_size": 8,
+    "lr": 5e-5,
+    "accumulation_steps": 1,
+    "weight_decay": 2e-2,
+}
+TRAINING_DPO_CONFIG = {
+    "dataset_max_samples": 3000,
+    "max_length": 2048,
+    "num_train_epochs": 1,
+    "warmup_ratio": 0.2,
+    "batch_size": 8,
+    "lr": 1e-5,
+    "accumulation_steps": 1,
+    "weight_decay": 2e-2,
+}
