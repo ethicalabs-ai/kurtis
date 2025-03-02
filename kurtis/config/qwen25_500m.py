@@ -39,7 +39,7 @@ TRAINING_CONFIG = {
     "weight_decay": 2e-2,
 }
 TRAINING_DPO_CONFIG = {
-    "dataset_max_samples": 3000,
+    "dataset_max_samples": 2000,
     "max_length": 2048,
     "num_train_epochs": 1,
     "warmup_ratio": 0.2,
