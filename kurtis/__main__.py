@@ -13,6 +13,7 @@ from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
 from .train_dpo import generate_dpo_dataset, clean_dpo_dataset, train_dpo_model
+from .defaults import TrainingConfig
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -64,8 +65,9 @@ def handle_train_dpo(config, output_dir, push_model):
         click.echo("No 'train' split found in dpo dataset.")
         return
     train_dataset = raw_datasets["train"]
+    training_cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
     if config.dataset_max_samples:
-        train_dataset = train_dataset.select(range(config.dataset_max_samples))
+        train_dataset = train_dataset.select(range(training_cfg.dataset_max_samples))
 
     model_name = config.HF_REPO_ID
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
