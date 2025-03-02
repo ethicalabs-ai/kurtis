@@ -23,7 +23,7 @@ class TrainingConfig:
     tf32: bool = True
     checkpointing: bool = True
     warmup_ratio: float = 0.03
-    num_train_epochs: int = 3
+    num_train_epochs: int = 2
     batch_size: int = 1
     max_length: int = 2048
     max_grad_norm: float = 1.0
