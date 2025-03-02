@@ -66,7 +66,7 @@ def handle_train_dpo(config, output_dir, push_model):
         return
     train_dataset = raw_datasets["train"]
     training_cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
-    if config.dataset_max_samples:
+    if training_cfg.dataset_max_samples:
         train_dataset = train_dataset.select(range(training_cfg.dataset_max_samples))
 
     model_name = config.HF_REPO_ID
