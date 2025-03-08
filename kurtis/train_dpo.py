@@ -10,6 +10,7 @@ from transformers import AutoTokenizer
 from trl import DPOTrainer, DPOConfig
 from peft import PeftModel, prepare_model_for_kbit_training
 
+from .model import save_and_merge_model
 from .utils import free_unused_memory
 from .defaults import TrainingConfig
 
@@ -159,7 +160,8 @@ def train_dpo_model(
 ):
     cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
-    final_checkpoint_dir = os.path.join(
+    final_checkpoint_dir = os.path.join(model_dirname, cfg.dpo_final_checkpoint_name)
+    final_output_merged_dir = os.path.join(
         model_dirname, cfg.dpo_final_merged_checkpoint_name
     )
 
@@ -204,3 +206,7 @@ def train_dpo_model(
     del model
     free_unused_memory()
     click.echo(f"DPO model saved to {final_checkpoint_dir}")
+    # Save final model
+    save_and_merge_model(
+        final_checkpoint_dir, final_output_merged_dir, config.HF_REPO_ID, push
+    )

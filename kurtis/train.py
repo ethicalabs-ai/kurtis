@@ -1,12 +1,11 @@
 import os
 
-import click
 import transformers
-from peft import AutoPeftModelForCausalLM, PeftModel, prepare_model_for_kbit_training
+from peft import PeftModel, prepare_model_for_kbit_training
 from trl import SFTTrainer
 
 from .dataset import load_kurtis_dataset_from_config
-from .model import torch_dtype
+from .model import save_and_merge_model
 from .utils import free_unused_memory
 from .defaults import TrainingConfig
 
@@ -42,8 +41,10 @@ def train_model(
     # Configuration parameters
     cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
-    output_merged_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
-    final_checkpoint_dir = os.path.join(model_dirname, cfg.final_merged_checkpoint_name)
+    final_checkpoint_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
+    final_output_merged_dir = os.path.join(
+        model_dirname, cfg.final_merged_checkpoint_name
+    )
 
     model = prepare_model_for_kbit_training(model)
 
@@ -90,13 +91,6 @@ def train_model(
     free_unused_memory()
 
     # Save final model
-    model = AutoPeftModelForCausalLM.from_pretrained(
-        final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
+    save_and_merge_model(
+        final_checkpoint_dir, final_output_merged_dir, config.HF_REPO_ID, push
     )
-    model = model.merge_and_unload()
-    model.save_pretrained(output_merged_dir, safe_serialization=True)
-    if push:
-        model.push_to_hub(config.HF_REPO_ID, "Upload model")
-        tokenizer.push_to_hub(config.HF_REPO_ID, "Upload tokenizer")
-
-    click.echo(f"Model saved to {output_merged_dir}")
