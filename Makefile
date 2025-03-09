@@ -20,11 +20,8 @@ help:
 	@echo "  make preprocessing  - Preprocess the data using a pre-trained LLM."
 	@echo "  make train          - Train the model."
 	@echo "  make chat           - Start a prompt session with the model."
-	@echo "  make install        - Install project dependencies using Poetry."
-	@echo "  make install_cuda   - Install project dependencies using Poetry - CUDA."
-	@echo "  make cleanup        - Remove all files in the output directory with confirmation."
+	@echo "  make install        - Install project dependencies using uv."
 	@echo "  make eval_model     - Evaluate model."
-	@echo "  make push           - Push datasets to Huggingface."
 	@echo "  make docker_build   - Build the Docker image for the project."
 	@echo "  make docker_push    - Push the Docker image to the registry."
 	@echo "  make docker_run     - Run the Docker container with output mounted."
@@ -32,7 +29,7 @@ help:
 	@echo "  make docker_chat    - Start a prompt session inside the Docker container."
 
 
-# Train the model
+# Preprocess the dataset
 .PHONY: preprocessing
 preprocessing:
 	uv run $(PYTHON) -m $(MODULE) --preprocessing --config-module $(CONFIG_MODULE) --debug
@@ -42,15 +39,11 @@ preprocessing:
 train:
 	uv run $(PYTHON) -m $(MODULE) --train --config-module $(CONFIG_MODULE)
 
-# Train the model
+# Eval the model
 .PHONY: eval_model
 eval_model:
 	uv run $(PYTHON) -m $(MODULE) --eval-model --config-module $(CONFIG_MODULE)
 
-# Train the model
-.PHONY: push
-push:
-	uv run $(PYTHON) -m $(MODULE) --push --config-module $(CONFIG_MODULE)
 
 # Start a chat session
 .PHONY: chat

@@ -48,11 +48,14 @@ def train_model(
 
     model = prepare_model_for_kbit_training(model)
 
-    # Load dataset and create dataloaders
+    # Load dataset and create dataloaders (todo)
     train_loader = load_func(cfg)
+    eval_loader = load_func(cfg, split="validation")
+
     trainer = SFTTrainer(
         model=model,
         train_dataset=train_loader,
+        eval_dataset=eval_loader,
         max_seq_length=cfg.max_length,
         args=transformers.TrainingArguments(
             per_device_train_batch_size=cfg.batch_size,

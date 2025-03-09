@@ -8,7 +8,6 @@ from .evaluate import evaluate_main
 from .inference import inference_model
 from .model import load_model_and_tokenizer
 from .preprocess import preprocessing_main
-from .push import push_datasets_to_huggingface, push_dpo_datasets_to_huggingface
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
@@ -144,20 +143,6 @@ def handle_generate_dpo(debug=False):
     )
 
 
-def handle_push_datasets(config):
-    """
-    Push standard datasets to Hugging Face.
-    """
-    push_datasets_to_huggingface(config)
-
-
-def handle_push_dpo_datasets(config):
-    """
-    Push DPO datasets to Hugging Face.
-    """
-    push_dpo_datasets_to_huggingface(config)
-
-
 def handle_push_model(config, model_name, model_dirname):
     """
     Push a trained model to Hugging Face.
@@ -178,10 +163,6 @@ def handle_push_model(config, model_name, model_dirname):
 @click.option("--chat", is_flag=True, help="Interact with the trained model.")
 @click.option("--eval-model", is_flag=True, help="Evaluate the model.")
 @click.option("--generate-dpo", is_flag=True, help="Generate and clean DPO dataset.")
-@click.option("--push-datasets", is_flag=True, help="Push datasets to Hugging Face.")
-@click.option(
-    "--push-dpo-datasets", is_flag=True, help="Push DPO datasets to Hugging Face."
-)
 @click.option("--push-model", is_flag=True, help="Push model to Hugging Face.")
 @click.option(
     "--output-dir",
@@ -210,8 +191,6 @@ def main(
     chat,
     eval_model,
     generate_dpo,
-    push_datasets,
-    push_dpo_datasets,
     push_model,
     output_dir,
     config_module,
@@ -268,10 +247,6 @@ def main(
         handle_evaluation(config, model_dirname)
     elif generate_dpo:
         handle_generate_dpo(debug=debug)
-    elif push_datasets:
-        handle_push_datasets(config)
-    elif push_dpo_datasets:
-        handle_push_dpo_datasets(config)
     elif push_model:
         handle_push_model(config, model_name, model_dirname)
     else:

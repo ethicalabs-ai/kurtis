@@ -5,13 +5,15 @@ from datasets import load_dataset, concatenate_datasets
 from .defaults import TrainingConfig
 
 
-def _load_dataset(config: TrainingConfig):
+def _load_dataset(config: TrainingConfig, split: str = ""):
     """
     Generic function to load a dataset from Hugging Face datasets.
     """
     click.echo(f"Loading dataset: {config.dataset_name}")
     dataset = load_dataset(
-        config.dataset_name, config.dataset_subset or None, split=config.dataset_split
+        config.dataset_name,
+        config.dataset_subset or None,
+        split=split or config.dataset_split,
     )
 
     if config.dataset_max_samples:
@@ -20,13 +22,13 @@ def _load_dataset(config: TrainingConfig):
     return dataset
 
 
-def load_dataset_from_config(config: TrainingConfig):
+def load_dataset_from_config(config: TrainingConfig, split: str = ""):
     """
     Load a Q&A dataset based on the provided configuration dictionary.
     Applies optional filtering based on 'dataset_select' rules.
     Returns questions and answers separately for QA training.
     """
-    original_dataset = _load_dataset(config)
+    original_dataset = _load_dataset(config, split=split)
 
     if config.dataset_select:
         filtered_datasets = []
