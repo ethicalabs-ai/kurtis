@@ -1,4 +1,5 @@
-from dataclasses import dataclass, fields
+from dataclasses import MISSING, dataclass, field, fields
+from typing import List, Dict
 
 
 @dataclass
@@ -14,6 +15,7 @@ class TrainingConfig:
     """
 
     dataset_name: str = ""
+    dataset_domain: str = ""
     dataset_subset: str = ""
     dataset_split: str = ""
     prompt_column: str = "prompt"
@@ -37,11 +39,16 @@ class TrainingConfig:
     final_merged_checkpoint_name: str = "final_merged_checkpoint"
     dpo_final_checkpoint_name: str = "dpo_final_checkpoint"
     dpo_final_merged_checkpoint_name: str = "dpo_final_merged_checkpoint"
+    dataset_select: List[Dict] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, cfg: dict):
-        init_kwargs = {
-            field.name: cfg.get(field.name, getattr(cls, field.name))
-            for field in fields(cls)
-        }
+        init_kwargs = {}
+        for field_obj in fields(cls):
+            if field_obj.name in cfg:
+                init_kwargs[field_obj.name] = cfg[field_obj.name]
+            elif field_obj.default is not MISSING:
+                init_kwargs[field_obj.name] = field_obj.default
+            elif field_obj.default_factory is not MISSING:
+                init_kwargs[field_obj.name] = field_obj.default_factory()
         return cls(**init_kwargs)

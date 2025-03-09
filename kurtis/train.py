@@ -4,7 +4,7 @@ import transformers
 from peft import PeftModel, prepare_model_for_kbit_training
 from trl import SFTTrainer
 
-from .dataset import load_kurtis_dataset_from_config
+from .dataset import load_dataset_from_config
 from .model import save_and_merge_model
 from .utils import free_unused_memory
 from .defaults import TrainingConfig
@@ -17,7 +17,7 @@ def train_model(
     output_dir,
     model_output,
     push=True,
-    load_func=load_kurtis_dataset_from_config,
+    load_func=load_dataset_from_config,
 ):
     """
     Train the model using LoRa and handle sequences/loss computation.

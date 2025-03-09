@@ -27,10 +27,10 @@ LORA_CONFIG = LoraConfig(
     use_dora=True,
 )
 TRAINING_CONFIG = {
-    "dataset_name": "mrs83/kurtis_mental_health_final",
+    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
     "dataset_split": "train",
     "dataset_max_samples": 10000,
-    "max_length": 2048,
+    "max_length": 1024,
     "num_train_epochs": 2,
     "warmup_ratio": 0.2,
     "batch_size": 8,
@@ -40,7 +40,7 @@ TRAINING_CONFIG = {
 }
 TRAINING_DPO_CONFIG = {
     "dataset_max_samples": 2000,
-    "max_length": 2048,
+    "max_length": 1024,
     "num_train_epochs": 1,
     "warmup_ratio": 0.2,
     "batch_size": 8,
