@@ -183,6 +183,7 @@ def prepare_final_dataset(
 def save_dataset(dataset, file_name):
     df = pd.DataFrame(dataset)
     df.to_parquet(file_name)
+    df.to_csv(f"{file_name}.csv")
 
 
 def preprocessing_main(
