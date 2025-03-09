@@ -15,6 +15,7 @@ class TrainingConfig:
     """
 
     dataset_name: str = ""
+    dataset_domain: str = ""
     dataset_subset: str = ""
     dataset_split: str = ""
     prompt_column: str = "prompt"

@@ -7,7 +7,7 @@ import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
-from .dataset import load_preprocessing_dataset_from_config
+from .dataset import load_dataset_from_config
 from .inference import batch_inference
 from .utils import get_device
 
@@ -119,7 +119,7 @@ def evaluate_main(
 
     # Load datasets from config
     click.echo("Testing on kurtis dataset")
-    dataset = load_preprocessing_dataset_from_config(config.EVALUATION_DATASET)
+    dataset = load_dataset_from_config(config.EVALUATION_DATASET)
 
     val_dataset = dataset.select(range(max(1, int(eval_ratio * len(dataset)))))
 

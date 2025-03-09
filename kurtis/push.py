@@ -1,27 +1,27 @@
 import click
 
-from datasets import load_dataset, load_from_disk, DatasetDict
+from datasets import load_from_disk
+
+
+from datasets import Dataset
+import pandas as pd
 
 
 def push_dataset_to_huggingface(dataset_path, repo_name):
     """
     Function to push a dataset to Hugging Face Hub.
     Args:
-        dataset_path (str): Path to the dataset.
+        dataset_path (str): Path to the Parquet file.
         repo_name (str): Repository name on Hugging Face Hub.
     """
     try:
-        # Attempt to load the dataset using load_from_disk
+        # Attempt to load as Hugging Face dataset directory
         dataset = load_from_disk(dataset_path)
-    except ValueError:
-        # If loading from disk fails, fallback to load_dataset
-        dataset = load_dataset(dataset_path)
-
-    # Ensure dataset is in a DatasetDict for compatibility with push_to_hub
-    if not isinstance(dataset, DatasetDict):
-        dataset = DatasetDict({"train": dataset})
-
-    # Push the dataset to Hugging Face Hub
+    except (ValueError, FileNotFoundError):
+        # If loading as HF dataset fails, load from Parquet directly
+        df = pd.read_parquet(dataset_path)
+        dataset = Dataset.from_pandas(df)
+    # Push to Hub
     dataset.push_to_hub(repo_name)
 
 

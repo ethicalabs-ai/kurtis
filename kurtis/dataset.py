@@ -1,6 +1,7 @@
 import click
 
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
+
 from .defaults import TrainingConfig
 
 
@@ -19,7 +20,7 @@ def _load_dataset(config: TrainingConfig):
     return dataset
 
 
-def load_preprocessing_dataset_from_config(config: TrainingConfig):
+def load_dataset_from_config(config: TrainingConfig):
     """
     Load a Q&A dataset based on the provided configuration dictionary.
     Applies optional filtering based on 'dataset_select' rules.
@@ -28,8 +29,6 @@ def load_preprocessing_dataset_from_config(config: TrainingConfig):
     original_dataset = _load_dataset(config)
 
     if config.dataset_select:
-        from datasets import concatenate_datasets
-
         filtered_datasets = []
         for rule in config.dataset_select:
             # Make a copy of the original dataset:
@@ -53,6 +52,7 @@ def load_preprocessing_dataset_from_config(config: TrainingConfig):
             "question": str(x[config.prompt_column]),
             "answer": str(x[config.response_column]),
             "dataset_name": str(x.get("dataset_name", config.dataset_name)),
+            "dataset_domain": str(x.get("dataset_domain", config.dataset_domain)),
         }
     )
     return dataset
@@ -80,21 +80,3 @@ def filter_dataset_by_rule(dataset, select_rule):
         filtered_ds = filtered_ds.select(range(min(len(filtered_ds), max_samples)))
 
     return filtered_ds
-
-
-def load_kurtis_dataset_from_config(config: TrainingConfig):
-    """
-    Load a Kurtis dataset based on the provided configuration dictionary.
-    Returns questions and answers sep arately for QA training.
-    """
-    dataset = _load_dataset(config)
-    dataset = dataset.map(
-        lambda x: {
-            "question": str(x["question"]),
-            "answer": str(x["answer"]),
-            "summary": str(x["summary"]),
-            "answer_summary": str(x["answer_summary"]),
-            "dataset_name": config.dataset_name,
-        }
-    )
-    return dataset

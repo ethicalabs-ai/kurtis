@@ -11,6 +11,8 @@ import torch
 from rich.console import Console
 from rich.panel import Panel
 from rich.style import Style
+from nltk.tokenize import sent_tokenize
+from transformers import PreTrainedTokenizer
 
 
 def get_kurtis_title() -> Tuple[str, str]:
@@ -88,3 +90,27 @@ def free_unused_memory() -> None:
         except AttributeError:
             pass
     gc.collect()
+
+
+# Intelligent sentence splitting and truncating
+def clean_and_truncate(
+    text: str, max_length: int, tokenizer: PreTrainedTokenizer
+) -> str:
+    text = text.strip()
+    sentences = sent_tokenize(text)  # Split the text into sentences
+    truncated_text = ""
+    total_length = 0
+
+    for sentence in sentences:
+        # Encode the sentence to get its token length
+        sentence_length = len(tokenizer.encode(sentence, add_special_tokens=False))
+
+        # Check if adding this sentence would exceed the max_length
+        if total_length + sentence_length > max_length:
+            break  # Stop if adding the sentence would exceed the token limit
+
+        # Add the sentence to the truncated text
+        truncated_text += sentence + " "
+        total_length += sentence_length
+
+    return truncated_text.strip()  # Return the truncated text without extra spaces

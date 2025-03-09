@@ -2,18 +2,19 @@ from peft import LoraConfig, TaskType
 
 TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
-INFERENCE_MODEL = "mrs83/Kurtis-SmolLM2-1.7B-Instruct"
+INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
-HF_REPO_ID = "mrs83/Kurtis-SmolLM2-1.7B-Instruct"
-HF_DPO_REPO_ID = "mrs83/Kurtis-SmolLM2-1.7B-Instruct-DPO"
-DPO_DATASET_NAME = "mrs83/kurtis_mental_health_dpo"
+HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
+HF_DPO_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct-DPO"
+DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
+DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
 
 TRAINING_CONFIG = {
-    "dataset_name": "mrs83/kurtis_mental_health_final",
+    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
     "dataset_split": "train",
-    "dataset_max_samples": 10000,
-    "max_length": 2048,
+    "dataset_max_samples": 35000,
+    "max_length": 1024,
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
     "batch_size": 8,
@@ -22,7 +23,7 @@ TRAINING_CONFIG = {
     "weight_decay": 2e-2,
 }
 TRAINING_DPO_CONFIG = {
-    "max_length": 2048,
+    "max_length": 1024,
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
     "batch_size": 8,
@@ -33,6 +34,7 @@ TRAINING_DPO_CONFIG = {
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
         "dataset_name": "datasets/kurtis_mental_health",
+        "dataset_domain": "mental-health",
         "prompt_column": "Context",
         "response_column": "Response",
         "dataset_split": "train",
@@ -41,34 +43,47 @@ DATASETS_CONFIG = {
     },
     "marmikpandya_mental_health": {
         "dataset_name": "marmikpandya/mental-health",
+        "dataset_domain": "mental-health",
         "prompt_column": "input",
         "response_column": "output",
         "dataset_split": "train",
         "dataset_max_samples": 3500,
-        "max_length": 512,
+        "max_length": 1024,
     },
     "fadodr_mental_health_therapy": {
         "dataset_name": "fadodr/mental_health_therapy",
+        "dataset_domain": "mental-health",
         "prompt_column": "input",
         "response_column": "output",
         "dataset_split": "train",
         "dataset_max_samples": 3500,
-        "max_length": 512,
+        "max_length": 1024,
     },
     "amod_mental_health_counseling_conversations": {
         "dataset_name": "Amod/mental_health_counseling_conversations",
+        "dataset_domain": "mental-health",
         "prompt_column": "Context",
         "response_column": "Response",
         "dataset_split": "train",
         "dataset_max_samples": 3500,
-        "max_length": 512,
+        "max_length": 1024,
+    },
+    "google_boolq": {
+        "dataset_name": "google/boolq",
+        "dataset_domain": "general-qa",
+        "prompt_column": "question",
+        "response_column": "passage",
+        "dataset_split": "train",
+        "dataset_max_samples": 3500,
+        "max_length": 1024,
     },
     "strix_philosophy_qa": {
         "dataset_name": "sayhan/strix-philosophy-qa",
+        "dataset_domain": "philosophy",
         "prompt_column": "question",
         "response_column": "answer",
         "dataset_split": "train",
-        "max_length": 512,
+        "max_length": 1024,
         "dataset_select": [
             {
                 "classes": [
@@ -155,12 +170,13 @@ DATASETS_CONFIG = {
                     "category:feminist-philosophy-biology",
                     "category:ecology",
                 ],
-                "max_length": 512,
+                "max_length": 1024,
             },
         ],
     },
     "tellikoroma_mental_health": {
         "dataset_name": "tellikoroma/mentalhealth",
+        "dataset_domain": "mental-health",
         "prompt_column": "pattern",
         "response_column": "response",
         "dataset_split": "train",
@@ -174,17 +190,17 @@ DATASETS_CONFIG = {
                     "tag:night",
                 ],
                 "max_samples": 7000,
-                "max_length": 512,
+                "max_length": 1024,
             },
             {
                 "classes": ["tag:learn-more", "tag:user-disagree", "tag:user-advice"],
                 "max_samples": 5000,
-                "max_length": 512,
+                "max_length": 1024,
             },
             {
                 "classes": ["tag:meditation", "tag:user-meditation"],
                 "max_samples": 4000,
-                "max_length": 512,
+                "max_length": 1024,
             },
             {
                 "classes": [
@@ -193,7 +209,7 @@ DATASETS_CONFIG = {
                     "tag:pandora-useful",
                 ],
                 "max_samples": 5000,
-                "max_length": 512,
+                "max_length": 1024,
             },
             {
                 "classes": [
@@ -230,28 +246,27 @@ DATASETS_CONFIG = {
                     "tag:fact-32",
                 ],
                 "max_samples": 4000,
-                "max_length": 512,
+                "max_length": 1024,
             },
         ],
-        "max_length": 512,
+        "max_length": 1024,
     },
 }
 
 
 EVALUATION_DATASET = {
-    "dataset_name": "Amod/mental_health_counseling_conversations",  # TODO: switch to kurtis validation set
-    "prompt_column": "Context",
-    "response_column": "Response",
+    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
+    "prompt_column": "question",
+    "response_column": "answer",
     "dataset_max_samples": 500,
     "split": "validation",
-    "max_length": 512,
+    "max_length": 1024,
 }
 
 
 FINAL_DATASETS = {
-    "datasets/kurtis_mental_health": "ethicalabs/kurtis_mental_health",
-    "datasets/kurtis_mental_health_initial_v2": "ethicalabs/kurtis_mental_health_initial_v2",
-    "datasets/kurtis_mental_health_final_v2": "ethicalabs/kurtis_mental_health_final_v2",
+    # "datasets/kurtis_mental_health": "ethicalabs/kurtis_mental_health",
+    "datasets/kurtis_e1_sft/": DATASET_NAME,
 }
 DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
