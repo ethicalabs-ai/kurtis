@@ -13,6 +13,8 @@ DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
 TRAINING_CONFIG = {
     "dataset_name": "ethicalabs/Kurtis-E1-SFT",
     "dataset_split": "train",
+    "prompt_column": "question",
+    "response_column": "answer",
     "max_length": 1024,
     "num_train_epochs": 3,
     "warmup_ratio": 0.2,
