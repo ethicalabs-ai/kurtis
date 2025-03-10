@@ -207,6 +207,12 @@ def train_dpo_model(
     free_unused_memory()
     click.echo(f"DPO model saved to {final_checkpoint_dir}")
     # Save final model
+    chat_template = getattr(config, "CHAT_TEMPLATE", "")
+    # Save final model
     save_and_merge_model(
-        final_checkpoint_dir, final_output_merged_dir, config.HF_REPO_ID, push
+        final_checkpoint_dir,
+        final_output_merged_dir,
+        chat_template=chat_template,
+        hf_repo_id=config.HF_DPO_REPO_ID,
+        push=push,
     )

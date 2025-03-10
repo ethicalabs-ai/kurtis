@@ -21,11 +21,12 @@ torch_dtype = (
 )
 
 # Configure 4-bit quantization settings.
-nf4_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_use_double_quant=True,
-    bnb_4bit_compute_dtype=torch_dtype,
+bnb_config = (
+    BitsAndBytesConfig(
+        load_in_4bit=True,
+    )
+    if torch.cuda.is_available()
+    else None
 )
 
 
@@ -65,24 +66,30 @@ def load_model_and_tokenizer(
     model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto",
-        quantization_config=nf4_config,
+        quantization_config=bnb_config,
         torch_dtype=torch_dtype,
     )
     return model, tokenizer
 
 
 def save_and_merge_model(
-    final_checkpoint_dir: str, output_merged_dir: str, hf_repo_id: str, push: bool
+    final_checkpoint_dir: str,
+    output_merged_dir: str,
+    chat_template: str,
+    hf_repo_id: str = "",
+    push: bool = True,
 ):
     """Save the adapter model and tokenizer."""
     peft_config = PeftConfig.from_pretrained(final_checkpoint_dir)
     base_model_path = peft_config.base_model_name_or_path
     tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+    if chat_template:
+        tokenizer.chat_template = chat_template
     model = AutoPeftModelForCausalLM.from_pretrained(
         final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
     )
     model = model.merge_and_unload()
     model.save_pretrained(output_merged_dir, safe_serialization=True)
-    if push:
+    if push and hf_repo_id:
         model.push_to_hub(hf_repo_id, "Upload model")
         tokenizer.push_to_hub(hf_repo_id, "Upload tokenizer")
