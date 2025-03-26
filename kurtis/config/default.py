@@ -34,30 +34,11 @@ TRAINING_DPO_CONFIG = {
 }
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
-        "dataset_name": "datasets/kurtis_mental_health",
+        "dataset_name": "ethicalabs/Kurtis-E1-Multilingual-01-SFT",
         "dataset_domain": "mental-health",
-        "prompt_column": "Context",
-        "response_column": "Response",
+        "prompt_column": "question",
+        "response_column": "answer",
         "dataset_split": "train",
-        "dataset_max_samples": 4500,
-        "max_length": 512,
-    },
-    "marmikpandya_mental_health": {
-        "dataset_name": "marmikpandya/mental-health",
-        "dataset_domain": "mental-health",
-        "prompt_column": "input",
-        "response_column": "output",
-        "dataset_split": "train",
-        "dataset_max_samples": 3500,
-        "max_length": 1024,
-    },
-    "fadodr_mental_health_therapy": {
-        "dataset_name": "fadodr/mental_health_therapy",
-        "dataset_domain": "mental-health",
-        "prompt_column": "input",
-        "response_column": "output",
-        "dataset_split": "train",
-        "dataset_max_samples": 3500,
         "max_length": 1024,
     },
     "amod_mental_health_counseling_conversations": {
@@ -75,7 +56,7 @@ DATASETS_CONFIG = {
         "prompt_column": "question",
         "response_column": "passage",
         "dataset_split": "train",
-        "dataset_max_samples": 3500,
+        "dataset_max_samples": 7500,
         "max_length": 1024,
     },
     "strix_philosophy_qa": {

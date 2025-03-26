@@ -52,7 +52,7 @@ def prepare_initial_dataset(config, tokenizer, max_length):
     return dataset
 
 
-def process_dataset(dataset, split_ratio=0.2):
+def process_dataset(dataset, split_ratio=0.05):
     """
     Splits a dataset into train and validation sets, shuffles, and saves them as TWO Parquet files.
     Args:
@@ -61,17 +61,10 @@ def process_dataset(dataset, split_ratio=0.2):
         split_ratio (float): Proportion for validation (default: 0.2).
     """
     dataset = dataset.train_test_split(test_size=split_ratio, shuffle=True, seed=42)
-    print(dataset)
     return dataset
 
 
-def preprocessing_main(
-    config,
-    max_length=512,
-    refresh=False,
-    initial_dataset_name="kurtis_e1_sft",
-    debug=False,
-):
+def preprocessing_main(config, max_length=512, debug=False):
     nltk.download("punkt")
     nltk.download("punkt_tab")
     if not torch.cuda.is_available():
@@ -82,4 +75,4 @@ def preprocessing_main(
     initial_dataset = prepare_initial_dataset(config, tokenizer, max_length)
     dataset = process_dataset(initial_dataset)
     dataset["train"].push_to_hub(config.DATASET_NAME, split="train")
-    dataset["test"].push_to_hub(config.DATASET_NAME, split="test")
+    dataset["test"].push_to_hub(config.DATASET_NAME, split="validation")
