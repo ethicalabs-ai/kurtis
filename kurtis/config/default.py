@@ -16,7 +16,7 @@ TRAINING_CONFIG = {
     "prompt_column": "question",
     "response_column": "answer",
     "max_length": 1024,
-    "num_train_epochs": 3,
+    "num_train_epochs": 2,
     "warmup_ratio": 0.2,
     "batch_size": 8,
     "lr": 5e-5,
@@ -25,7 +25,7 @@ TRAINING_CONFIG = {
 }
 TRAINING_DPO_CONFIG = {
     "max_length": 1024,
-    "num_train_epochs": 2,
+    "num_train_epochs": 1,
     "warmup_ratio": 0.2,
     "batch_size": 8,
     "lr": 1e-5,
