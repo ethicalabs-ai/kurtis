@@ -254,7 +254,7 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=16,
+    r=8,
     lora_alpha=32,
     lora_dropout=0.075,
     target_modules=[
