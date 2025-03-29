@@ -1,12 +1,12 @@
 from peft import LoraConfig, TaskType
 
-TRANSFORMERS_MODEL_PRETRAINED = "ethicalabs/Kurtis-E1.1-Qwen2.5-0.5B-Instruct-Zero"
+TRANSFORMERS_MODEL_PRETRAINED = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-Zero"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
-MODEL_NAME = "Kurtis-E1.1-Qwen2.5-0.5B-Instruct-SFT"
-MODEL_DPO_NAME = "Kurtis-E1.1-Qwen2.5-0.5B-Instruct-DPO"
-HF_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-0.5B-Instruct-SFT"
-HF_DPO_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-0.5B-Instruct-DPO"
+MODEL_NAME = "Kurtis-E1.1-Qwen2.5-3B-Instruct-SFT"
+MODEL_DPO_NAME = "Kurtis-E1.1-Qwen2.5-3B-Instruct-DPO"
+HF_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-SFT"
+HF_DPO_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-DPO"
 DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
 DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
 
@@ -254,9 +254,9 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=24,
-    lora_alpha=48,
-    lora_dropout=0.05,
+    r=16,
+    lora_alpha=64,
+    lora_dropout=0.075,
     target_modules=[
         "down_proj",
         "gate_proj",
