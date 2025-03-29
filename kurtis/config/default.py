@@ -16,7 +16,7 @@ TRAINING_CONFIG = {
     "prompt_column": "question",
     "response_column": "answer",
     "max_length": 1024,
-    "num_train_epochs": 2,
+    "num_train_epochs": 1,
     "warmup_ratio": 0.2,
     "batch_size": 8,
     "lr": 5e-5,
@@ -255,7 +255,7 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
     r=16,
-    lora_alpha=64,
+    lora_alpha=32,
     lora_dropout=0.075,
     target_modules=[
         "down_proj",
