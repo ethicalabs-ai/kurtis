@@ -22,6 +22,7 @@ TRAINING_CONFIG = {
     "lr": 5e-5,
     "accumulation_steps": 1,
     "weight_decay": 2e-2,
+    "dataset_max_samples": 50000,
 }
 TRAINING_DPO_CONFIG = {
     "max_length": 1024,
@@ -255,8 +256,8 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
     r=8,
-    lora_alpha=32,
-    lora_dropout=0.075,
+    lora_alpha=16,
+    lora_dropout=0.05,
     target_modules=[
         "down_proj",
         "gate_proj",
