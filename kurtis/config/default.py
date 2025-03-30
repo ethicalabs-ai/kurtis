@@ -35,7 +35,7 @@ TRAINING_DPO_CONFIG = {
 }
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
-        "dataset_name": "ethicalabs/Kurtis-E1-Multilingual-01-SFT",
+        "dataset_name": "mrs83/kurtis_mental_health_initial",
         "dataset_domain": "mental-health",
         "prompt_column": "question",
         "response_column": "answer",
