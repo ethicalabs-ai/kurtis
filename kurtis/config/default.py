@@ -1,6 +1,6 @@
 from peft import LoraConfig, TaskType
 
-TRANSFORMERS_MODEL_PRETRAINED = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-Zero"
+TRANSFORMERS_MODEL_PRETRAINED = "Qwen/Qwen2.5-3B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_NAME = "Kurtis-E1.1-Qwen2.5-3B-Instruct-SFT"
