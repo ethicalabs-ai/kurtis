@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------
+# DISCLAIMER: This code is manually authored and reviewed by humans.
+#             Includes natural human imperfections and creative patterns.
+#             Any imperfections are responsibly owned by its human
+#             creators.
+# -----------------------------------------------------------------------
+
+import os
 from peft import LoraConfig, TaskType
 
 TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
@@ -9,9 +17,20 @@ HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
 HF_DPO_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct-DPO"
 DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
 DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
+OPENAI_API_URL = "http://localhost:11434/v1"
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "ollama")
+TRANSLATION_GGUF_MODEL = "hf.co/mradermacher/TowerInstruct-7B-v0.2-GGUF:IQ4_XS"
+TRANSLATION_LANGUAGES = [
+    "Italian",
+    "Spanish",
+    "German",
+    "French",
+    "Portuguese",
+    "Dutch",
+]
 
 TRAINING_CONFIG = {
-    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
+    "dataset_name": DATASET_NAME,
     "dataset_split": "train",
     "prompt_column": "question",
     "response_column": "answer",
@@ -260,7 +279,7 @@ DATASETS_CONFIG = {
 
 
 EVALUATION_DATASET = {
-    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
+    "dataset_name": DATASET_NAME,
     "prompt_column": "question",
     "response_column": "answer",
     "dataset_max_samples": 500,
