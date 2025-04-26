@@ -82,7 +82,7 @@ def preprocessing_main(config, max_seq_length=512, push=False, debug=False):
 
 
 @click.command(name="preprocess")
-@click.option("--max-seq-length", default=512, help="Max sequence length.")
+@click.option("--max-seq-length", default=1024, help="Max sequence length.")
 @click.option("--push", is_flag=True, help="Push dataset to Hugging Face.")
 @click.pass_context
 def command(ctx, max_seq_length, push):
