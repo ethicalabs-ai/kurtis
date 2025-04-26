@@ -31,6 +31,7 @@ dependencies = [
     "tqdm>=4.67.0",
     "bitsandbytes>=0.44.1 ; platform_machine == 'x86_64'",
     "setuptools>=75.3.0",
+    "openai>=1.76.0",
 ]
 
 [tool.uv.sources]
