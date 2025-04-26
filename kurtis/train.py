@@ -75,6 +75,7 @@ def train_model(
             optim=cfg.optim,
             run_name=model_output,
             save_strategy="epoch",
+            report_to="wandb",
         ),
         peft_config=config.LORA_CONFIG,
         formatting_func=formatting_prompts_func,

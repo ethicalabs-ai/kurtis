@@ -1,12 +1,12 @@
 from peft import LoraConfig, TaskType
 
-TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
+TRANSFORMERS_MODEL_PRETRAINED = "Qwen/Qwen2.5-3B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
-MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
-MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
-HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
-HF_DPO_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct-DPO"
+MODEL_NAME = "Kurtis-E1.1-Qwen2.5-3B-Instruct-SFT"
+MODEL_DPO_NAME = "Kurtis-E1.1-Qwen2.5-3B-Instruct-DPO"
+HF_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-SFT"
+HF_DPO_REPO_ID = "ethicalabs/Kurtis-E1.1-Qwen2.5-3B-Instruct-DPO"
 DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
 DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
 
@@ -16,16 +16,17 @@ TRAINING_CONFIG = {
     "prompt_column": "question",
     "response_column": "answer",
     "max_length": 1024,
-    "num_train_epochs": 3,
+    "num_train_epochs": 1,
     "warmup_ratio": 0.2,
     "batch_size": 8,
     "lr": 5e-5,
     "accumulation_steps": 1,
     "weight_decay": 2e-2,
+    "dataset_max_samples": 50000,
 }
 TRAINING_DPO_CONFIG = {
     "max_length": 1024,
-    "num_train_epochs": 2,
+    "num_train_epochs": 1,
     "warmup_ratio": 0.2,
     "batch_size": 8,
     "lr": 1e-5,
@@ -34,7 +35,7 @@ TRAINING_DPO_CONFIG = {
 }
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
-        "dataset_name": "ethicalabs/Kurtis-E1-Multilingual-01-SFT",
+        "dataset_name": "mrs83/kurtis_mental_health_initial",
         "dataset_domain": "mental-health",
         "prompt_column": "question",
         "response_column": "answer",
@@ -254,8 +255,8 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=24,
-    lora_alpha=48,
+    r=8,
+    lora_alpha=16,
     lora_dropout=0.05,
     target_modules=[
         "down_proj",
@@ -272,7 +273,9 @@ LORA_CONFIG = LoraConfig(
 
 QA_INSTRUCTION = "You are a compassionate and empathetic mental-health assistant named Kurtis, trained by ethicalabs.ai.\nYou provide thoughtful and supportive responses to user queries."
 CHAT_TEMPLATE = (
-    "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\n"
+    "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- messages[0]['content'] }}\n    {%- else %}\n        {{- '"
     + QA_INSTRUCTION
-    + "<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+    + "' }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else %}\n        {{- '<|im_start|>system\\n"
+    + QA_INSTRUCTION
+    + "<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) or (message.role == \"assistant\" and not message.tool_calls) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role }}\n        {%- if message.content %}\n            {{- '\\n' + message.content }}\n        {%- endif %}\n        {%- for tool_call in message.tool_calls %}\n            {%- if tool_call.function is defined %}\n                {%- set tool_call = tool_call.function %}\n            {%- endif %}\n            {{- '\\n<tool_call>\\n{\"name\": \"' }}\n            {{- tool_call.name }}\n            {{- '\", \"arguments\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- '}\\n</tool_call>' }}\n        {%- endfor %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}\n"
 )

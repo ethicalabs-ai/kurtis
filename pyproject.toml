@@ -31,6 +31,7 @@ dependencies = [
     "tqdm>=4.67.0",
     "bitsandbytes>=0.44.1 ; platform_machine == 'x86_64'",
     "setuptools>=75.3.0",
+    "wandb>=0.19.8",
 ]
 
 [tool.uv.sources]
