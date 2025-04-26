@@ -31,6 +31,12 @@ class ChatApp(urwid.WidgetWrap):
         self.kwargs = kwargs
 
         # Chat history and input field
+        self.llm_history = [
+            {
+                "role": "system",
+                "content": config.QA_INSTRUCTION,
+            },
+        ]
         self.chat_history = urwid.SimpleListWalker([])
         self.chat_box = urwid.ListBox(self.chat_history)
         self.input_field = SubmitEdit("> ", multiline=False)
@@ -46,7 +52,9 @@ class ChatApp(urwid.WidgetWrap):
             "- Press **Enter** to submit your message.\n"
             "- Press **Esc** to exit the application."
         )
-        self.add_message(f"[{get_timestamp()}] System:\n{disclaimer}", "system")
+        self.add_message(
+            f"[{get_timestamp()}] System:\n{disclaimer}", "system", llm=False
+        )
 
         # Create layout with chat history and input, set focus to footer
         self.main_view = urwid.Frame(
@@ -62,10 +70,17 @@ class ChatApp(urwid.WidgetWrap):
         urwid.register_signal(ChatApp, ["update_message"])
         urwid.connect_signal(self, "update_message", self.update_message)
 
-    def add_message(self, message, style):
+    def add_message(self, message, style, llm=True):
         """Add a new message to the chat history and refresh the UI."""
         message_widget = urwid.Text(message)
         self.chat_history.append(urwid.AttrMap(message_widget, style))
+        if llm:
+            self.llm_history.append(
+                {
+                    "role": style,
+                    "content": message,
+                }
+            )
         # Auto-scroll to the latest message
         self.chat_box.set_focus(len(self.chat_history) - 1)
         self._invalidate()  # Refresh the UI immediately
@@ -96,7 +111,7 @@ class ChatApp(urwid.WidgetWrap):
         """Generate response in a separate thread."""
         try:
             response = self.inference_fn(
-                self.model, self.tokenizer, self.config, input_text, **self.kwargs
+                self.model, self.tokenizer, self.config, self.llm_history, **self.kwargs
             )
             ai_message = f"[{get_timestamp()}] Kurtis: {response}"
             # Schedule the UI update in the main loop
