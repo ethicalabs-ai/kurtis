@@ -56,7 +56,7 @@ DATASETS_CONFIG = {
         "prompt_column": "question",
         "response_column": "passage",
         "dataset_split": "train",
-        "dataset_max_samples": 7500,
+        "dataset_max_samples": 9000,
         "max_length": 1024,
     },
     "strix_philosophy_qa": {
