@@ -9,4 +9,4 @@ import click
 
 @click.command(name="merge")
 def command():
-    pass
+    raise NotImplementedError()

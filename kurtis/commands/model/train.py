@@ -9,4 +9,4 @@ import click
 
 @click.command(name="train")
 def command():
-    pass
+    raise NotImplementedError()

@@ -9,4 +9,4 @@ import click
 
 @click.command(name="quantize")
 def command():
-    pass
+    raise NotImplementedError()

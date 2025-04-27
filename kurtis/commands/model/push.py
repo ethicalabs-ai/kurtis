@@ -9,4 +9,4 @@ import click
 
 @click.command(name="push")
 def command():
-    pass
+    raise NotImplementedError()
