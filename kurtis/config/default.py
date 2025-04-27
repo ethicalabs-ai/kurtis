@@ -10,7 +10,7 @@ from peft import LoraConfig, TaskType
 
 TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
-INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
+INFERENCE_MODEL = "ethicalabs/Kurtis-E1-SmolLM2-1.7B-Instruct"
 MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
 HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"

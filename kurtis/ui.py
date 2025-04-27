@@ -52,9 +52,7 @@ class ChatApp(urwid.WidgetWrap):
             "- Press **Enter** to submit your message.\n"
             "- Press **Esc** to exit the application."
         )
-        self.add_message(
-            f"[{get_timestamp()}] System:\n{disclaimer}", "system", llm=False
-        )
+        self.add_message(disclaimer, "system")
 
         # Create layout with chat history and input, set focus to footer
         self.main_view = urwid.Frame(
@@ -70,17 +68,10 @@ class ChatApp(urwid.WidgetWrap):
         urwid.register_signal(ChatApp, ["update_message"])
         urwid.connect_signal(self, "update_message", self.update_message)
 
-    def add_message(self, message, style, llm=True):
+    def add_message(self, message, style):
         """Add a new message to the chat history and refresh the UI."""
         message_widget = urwid.Text(message)
         self.chat_history.append(urwid.AttrMap(message_widget, style))
-        if llm:
-            self.llm_history.append(
-                {
-                    "role": style,
-                    "content": message,
-                }
-            )
         # Auto-scroll to the latest message
         self.chat_box.set_focus(len(self.chat_history) - 1)
         self._invalidate()  # Refresh the UI immediately
@@ -92,6 +83,12 @@ class ChatApp(urwid.WidgetWrap):
             timestamp = get_timestamp()
             user_message = f"[{timestamp}] You: {input_text}"
             self.add_message(user_message, "user")
+            self.llm_history.append(
+                {
+                    "role": "user",
+                    "content": input_text,
+                }
+            )
 
             # Add loading cursor
             loading_message = f"[{get_timestamp()}] Kurtis: ... (thinking)"
@@ -114,6 +111,12 @@ class ChatApp(urwid.WidgetWrap):
                 self.model, self.tokenizer, self.config, self.llm_history, **self.kwargs
             )
             ai_message = f"[{get_timestamp()}] Kurtis: {response}"
+            self.llm_history.append(
+                {
+                    "role": "assistant",
+                    "content": response,
+                }
+            )
             # Schedule the UI update in the main loop
             self.update_message(ai_message, loading_index)
         except Exception as e:
