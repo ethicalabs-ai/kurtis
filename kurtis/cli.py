@@ -11,7 +11,7 @@ import importlib
 import pkgutil
 import os.path
 
-from kurtis.utils import load_config
+from kurtis.utils import load_config, print_kurtis_title
 
 
 def get_commands_from_pkg(pkg) -> dict:
@@ -50,6 +50,7 @@ def get_commands_from_pkg(pkg) -> dict:
 @click.option("--debug/--no-debug", default=False)
 def cli(ctx, config_module, debug):
     ctx.ensure_object(dict)
+    print_kurtis_title()
     click.echo(f"Debug mode is {'on' if debug else 'off'}")
     ctx.obj["DEBUG"] = debug
     ctx.obj["CONFIG"] = load_config(config_module)
