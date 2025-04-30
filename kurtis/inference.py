@@ -7,11 +7,10 @@ def inference_model(
     model,
     tokenizer,
     config,
-    input_text,
-    instruction=None,
+    messages,
 ):
     """
-    Generates a response from Kurtis.
+    Generates a response from Kurtis. Used for chat interface.
 
     Args:
         model: The trained language model.
@@ -21,27 +20,18 @@ def inference_model(
     Returns:
         str: The generated response from the model or an error message.
     """
-    if not instruction:
-        instruction = config.QA_INSTRUCTION
     response = None
     try:
         device = get_device()
         # Ensure the model is on the correct device
         model.eval()
-        messages = [
-            {
-                "role": "system",
-                "content": instruction,
-            },
-            {"role": "user", "content": input_text},
-        ]
         input_text = tokenizer.apply_chat_template(messages, tokenize=False)
         inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(
             device
         )
         with torch.no_grad():
             outputs = model.generate(
-                inputs,
+                input_ids=inputs,
                 max_new_tokens=512,
                 temperature=0.4,
                 top_p=0.9,
@@ -64,6 +54,8 @@ def batch_inference(
 ):
     """
     Generates responses from Kurtis for multiple input texts in a batch.
+
+    Used for evaluation.
 
     Args:
         model: The trained language model.

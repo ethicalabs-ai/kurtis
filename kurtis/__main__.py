@@ -7,7 +7,6 @@ from datasets import load_dataset
 from .evaluate import evaluate_main
 from .inference import inference_model
 from .model import load_model_and_tokenizer
-from .preprocess import preprocessing_main
 from .train import train_model
 from .ui import start_chat_wrapper
 from .utils import get_device, load_config, print_kurtis_title
@@ -18,13 +17,6 @@ from .defaults import TrainingConfig
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 device = get_device()
-
-
-def handle_preprocessing(config, debug):
-    """
-    Handle data preprocessing tasks.
-    """
-    preprocessing_main(config, debug=debug)
 
 
 def handle_train(
@@ -157,10 +149,8 @@ def handle_push_model(config, model_name, model_dirname):
 
 
 @click.command()
-@click.option("--preprocessing", is_flag=True, help="Pre-process the QA datasets.")
 @click.option("--train", is_flag=True, help="Train the model using QA datasets.")
 @click.option("--train-dpo", is_flag=True, help="Train the model using DPO.")
-@click.option("--chat", is_flag=True, help="Interact with the trained model.")
 @click.option("--eval-model", is_flag=True, help="Evaluate the model.")
 @click.option("--generate-dpo", is_flag=True, help="Generate and clean DPO dataset.")
 @click.option("--push-model", is_flag=True, help="Push model to Hugging Face.")
@@ -185,10 +175,8 @@ def handle_push_model(config, model_name, model_dirname):
 @click.pass_context
 def main(
     ctx,
-    preprocessing,
     train,
     train_dpo,
-    chat,
     eval_model,
     generate_dpo,
     push_model,
@@ -216,11 +204,6 @@ def main(
         click.echo(f"Unable to import config module: {config_module}")
         ctx.exit(1)
 
-    # Handle preprocessing early return
-    if preprocessing:
-        handle_preprocessing(config, debug)
-        return
-
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
@@ -241,8 +224,6 @@ def main(
         )
     elif train_dpo:
         handle_train_dpo(config, output_dir, push_model)
-    elif chat:
-        handle_chat(config, model_dirname)
     elif eval_model:
         handle_evaluation(config, model_dirname)
     elif generate_dpo:

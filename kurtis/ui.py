@@ -31,6 +31,12 @@ class ChatApp(urwid.WidgetWrap):
         self.kwargs = kwargs
 
         # Chat history and input field
+        self.llm_history = [
+            {
+                "role": "system",
+                "content": config.QA_INSTRUCTION,
+            },
+        ]
         self.chat_history = urwid.SimpleListWalker([])
         self.chat_box = urwid.ListBox(self.chat_history)
         self.input_field = SubmitEdit("> ", multiline=False)
@@ -46,7 +52,7 @@ class ChatApp(urwid.WidgetWrap):
             "- Press **Enter** to submit your message.\n"
             "- Press **Esc** to exit the application."
         )
-        self.add_message(f"[{get_timestamp()}] System:\n{disclaimer}", "system")
+        self.add_message(disclaimer, "system")
 
         # Create layout with chat history and input, set focus to footer
         self.main_view = urwid.Frame(
@@ -77,6 +83,12 @@ class ChatApp(urwid.WidgetWrap):
             timestamp = get_timestamp()
             user_message = f"[{timestamp}] You: {input_text}"
             self.add_message(user_message, "user")
+            self.llm_history.append(
+                {
+                    "role": "user",
+                    "content": input_text,
+                }
+            )
 
             # Add loading cursor
             loading_message = f"[{get_timestamp()}] Kurtis: ... (thinking)"
@@ -96,9 +108,15 @@ class ChatApp(urwid.WidgetWrap):
         """Generate response in a separate thread."""
         try:
             response = self.inference_fn(
-                self.model, self.tokenizer, self.config, input_text, **self.kwargs
+                self.model, self.tokenizer, self.config, self.llm_history, **self.kwargs
             )
             ai_message = f"[{get_timestamp()}] Kurtis: {response}"
+            self.llm_history.append(
+                {
+                    "role": "assistant",
+                    "content": response,
+                }
+            )
             # Schedule the UI update in the main loop
             self.update_message(ai_message, loading_index)
         except Exception as e:
