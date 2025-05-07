@@ -2,7 +2,7 @@ import click
 
 from datasets import load_dataset, concatenate_datasets
 
-from .defaults import TrainingConfig
+from kurtis.defaults import TrainingConfig
 
 
 def _load_dataset(config: TrainingConfig, split: str = ""):

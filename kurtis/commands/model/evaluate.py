@@ -7,35 +7,34 @@
 import os
 import click
 
+from kurtis.utils import get_device
 from kurtis.model import load_model_and_tokenizer
+from kurtis.evaluate import evaluate_main
 
 
-def handle_push_model(config, model_name, model_dirname):
+def handle_evaluation(config, model_dirname):
     """
-    Push a trained model to Hugging Face.
+    Evaluate the model on configured datasets.
     """
     model, tokenizer = load_model_and_tokenizer(
         config,
-        model_name=model_name,
+        model_name=config.INFERENCE_MODEL,
         model_output=model_dirname,
     )
-    model.push_to_hub(config.HF_REPO_ID, "Upload model")
-    tokenizer.push_to_hub(config.HF_REPO_ID, "Upload tokenizer")
+    model.eval()
+    click.echo("Testing the model on configured datasets...")
+    evaluate_main(model, tokenizer, config)
 
 
-@click.command(name="push")
+@click.command(name="evaluate")
 @click.option(
     "--output-dir",
-    default="./output/models",
-    help="Directory where batch files will be saved.",
+    "-o",
+    default="./output",
+    help="Directory to save or load the model and checkpoints.",
 )
 @click.pass_context
-def command(ctx, output_dir, push_model):
+def command(ctx, output_dir):
     config = ctx.obj["CONFIG"]
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Common model paths
-    model_name = config.TRANSFORMERS_MODEL_PRETRAINED
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
-    handle_push_model(config, model_name, model_dirname)
+    handle_evaluation(config, model_dirname)

@@ -10,9 +10,9 @@ from transformers import AutoTokenizer
 from trl import DPOTrainer, DPOConfig
 from peft import PeftModel, prepare_model_for_kbit_training
 
-from .model import save_and_merge_model
-from .utils import free_unused_memory
-from .defaults import TrainingConfig
+from kurtis.model import save_and_merge_model
+from kurtis.utils import free_unused_memory
+from kurtis.defaults import TrainingConfig
 
 
 def generate_rejected_prompt(prompt: str, pipe, max_new_tokens=256, debug=False):

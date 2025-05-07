@@ -1,6 +1,6 @@
 import torch
 
-from .utils import get_device
+from kurtis.utils import get_device
 
 
 def inference_model(

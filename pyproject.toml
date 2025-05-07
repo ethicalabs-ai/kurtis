@@ -1,6 +1,6 @@
 [project]
 name = "kurtis"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Massimo R. Scamarcia <massimo.scamarcia@gmail.com>"]
 description = "Kurtis SLM Toolkit"
 readme = "README.md"
@@ -20,7 +20,7 @@ dependencies = [
     "safetensors>=0.4.5",
     "scikit-learn>=1.5.2",
     "sentencepiece>=0.2.0",
-    "transformers>=4.46.2",
+    "transformers>=4.51.3",
     "trl>=0.12.0",
     "urwid>=2.6.16",
     "torch==2.6.0 ; platform_machine != 'x86_64'",
@@ -33,6 +33,7 @@ dependencies = [
     "setuptools>=75.3.0",
     "openai>=1.76.0",
     "python-slugify>=8.0.4",
+    "huggingface-hub[hf-xet]>=0.30.2",
 ]
 
 [tool.uv.sources]
@@ -49,3 +50,7 @@ dev = [
     "pre-commit>=4.0.1",
     "ruff>=0.7.3",
 ]
+
+[[package]]
+name = "kurtis"
+version = "0.1.1"

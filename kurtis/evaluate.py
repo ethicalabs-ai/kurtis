@@ -7,9 +7,9 @@ import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
-from .dataset import load_dataset_from_config
-from .inference import batch_inference
-from .utils import get_device
+from kurtis.dataset import load_dataset_from_config
+from kurtis.inference import batch_inference
+from kurtis.utils import get_device
 
 device = get_device()
 
