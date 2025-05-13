@@ -1,4 +1,4 @@
-# Kurtis
+# Kurtis E1 Toolkit
 
 **Kurtis** is an experimental fine-tuning, evaluation and inference tool for [Kurtis E1](https://huggingface.co/collections/ethicalabs/kurtis-e1-67a9148e0836885c44c7902c).
 
@@ -44,7 +44,7 @@ You can interact with Kurtis by either training the model or starting a chat ses
 To train the model using the provided configuration:
 
 ```bash
-uv run -m kurtis --train --config-module kurtis.config.default
+uv run -m kurtis --config-module kurtis.config.default model train
 ```
 
 #### Start a Chat Session
@@ -52,12 +52,12 @@ uv run -m kurtis --train --config-module kurtis.config.default
 To start a conversation with the Kurtis model:
 
 ```bash
-uv run -m kurtis --chat --config-module kurtis.config.default
+uv run -m kurtis --config-module kurtis.config.default model chat
 ```
 
 ### Command-Line Options
 
-You can view all available command-line options using the `--help` flag:
+You can view all available command-line options using the `--help` flag, also on sub-commands:
 
 ```bash
 uv run -m kurtis --help
@@ -66,27 +66,49 @@ uv run -m kurtis --help
 The output will display:
 
 ```bash
-(kurtis) ➜  kurtis git:(main) ✗ uv run -m kurtis --help
+$ uv run -m kurtis --help
+Usage: python -m kurtis [OPTIONS] COMMAND [ARGS]...
 
-Usage: python -m kurtis [OPTIONS]
-
-  Main command for managing the Kurtis model: - Preprocess data - Train - Chat
-  interactively - Evaluate - Generate DPO data - Push datasets or model to
-  Hugging Face
+  Kurtis Toolkit
 
 Options:
-  --preprocessing           Pre-process the QA datasets.
-  --train                   Train the model using QA datasets.
-  --train-dpo               Train the model using DPO.
-  --chat                    Interact with the trained model.
-  --eval-model              Evaluate the model.
-  --generate-dpo            Generate and clean DPO dataset.
-  --push-model              Push model to Hugging Face.
-  -o, --output-dir TEXT     Directory to save or load the model and
-                            checkpoints.
   -c, --config-module TEXT  Kurtis python config module.
-  --debug                   Enable debug mode for verbose output.
-  --help                    Show this message and exit.
+  --debug / --no-debug
+  -h, --help                Show this message and exit.
+
+Commands:
+  dataset
+  model
+
+
+$ uv run -m kurtis dataset --help
+...
+Debug mode is off
+Usage: python -m kurtis dataset [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  dpo
+  preprocess
+  translate
+
+$ uv run -m kurtis model --help
+...
+Debug mode is off
+Usage: python -m kurtis model [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  chat
+  evaluate
+  push
+  train
+  train_dpo
+
 ```
 
 ### Makefile
