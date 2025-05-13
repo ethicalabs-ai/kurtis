@@ -76,7 +76,13 @@ def get_device() -> str:
     Returns:
         str: "cuda" if CUDA is available, otherwise "cpu".
     """
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    return (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.mps.is_available()
+        else "cpu"
+    )
 
 
 def free_unused_memory() -> None:

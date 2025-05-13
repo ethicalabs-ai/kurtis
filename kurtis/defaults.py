@@ -21,8 +21,8 @@ class TrainingConfig:
     prompt_column: str = "prompt"
     response_column: str = "response"
     dataset_max_samples: int = 0
-    bf16: bool = True
-    tf32: bool = True
+    bf16: bool = False
+    tf32: bool = False
     checkpointing: bool = True
     warmup_ratio: float = 0.03
     num_train_epochs: int = 2

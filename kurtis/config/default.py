@@ -1,17 +1,36 @@
+# -----------------------------------------------------------------------
+# DISCLAIMER: This code is manually authored and reviewed by humans.
+#             Includes natural human imperfections and creative patterns.
+#             Any imperfections are responsibly owned by its human
+#             creators.
+# -----------------------------------------------------------------------
+
+import os
 from peft import LoraConfig, TaskType
 
 TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
-INFERENCE_MODEL = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
+INFERENCE_MODEL = "ethicalabs/Kurtis-E1-SmolLM2-1.7B-Instruct"
 MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
 MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
 HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
 HF_DPO_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct-DPO"
 DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
 DPO_DATASET_NAME = "ethicalabs/Kurtis-E1-DPO"
+OPENAI_API_URL = "http://localhost:11434/v1"
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "ollama")
+TRANSLATION_GGUF_MODEL = "hf.co/mradermacher/TowerInstruct-7B-v0.2-GGUF:IQ4_XS"
+TRANSLATION_LANGUAGES = [
+    "Italian",
+    "Spanish",
+    "German",
+    "French",
+    "Portuguese",
+    "Dutch",
+]
 
 TRAINING_CONFIG = {
-    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
+    "dataset_name": DATASET_NAME,
     "dataset_split": "train",
     "prompt_column": "question",
     "response_column": "answer",
@@ -34,7 +53,7 @@ TRAINING_DPO_CONFIG = {
 }
 DATASETS_CONFIG = {
     "kurtis_mental_health": {
-        "dataset_name": "ethicalabs/Kurtis-E1-Multilingual-01-SFT",
+        "dataset_name": "mrs83/kurtis_mental_health_initial",
         "dataset_domain": "mental-health",
         "prompt_column": "question",
         "response_column": "answer",
@@ -56,7 +75,7 @@ DATASETS_CONFIG = {
         "prompt_column": "question",
         "response_column": "passage",
         "dataset_split": "train",
-        "dataset_max_samples": 7500,
+        "dataset_max_samples": 9000,
         "max_length": 1024,
     },
     "strix_philosophy_qa": {
@@ -151,6 +170,29 @@ DATASETS_CONFIG = {
                     "category:logic-ontology",
                     "category:feminist-philosophy-biology",
                     "category:ecology",
+                    "category:abilities",
+                    "category:altruism",
+                    "category:altruism-biological",
+                    "category:altruism-empirical",
+                    "category:analysis",
+                    "category:authenticity",
+                    "category:basing-epistemic",
+                    "category:boundary",
+                    "category:biodiversity",
+                    "category:causation-counterfactual",
+                    "category:causation-metaphysics",
+                    "category:causation-probabilistic",
+                    "category:change",
+                    "category:chaos",
+                    "category:cognitive-science",
+                    "category:communitarianism",
+                    "category:common-good",
+                    "category:computational-philosophy",
+                    "category:concept-evil",
+                    "category:concept-religion",
+                    "category:computational-mind",
+                    "category:computational-philosophy",
+                    "category:computational-linguistics",
                 ],
                 "max_length": 1024,
             },
@@ -237,7 +279,7 @@ DATASETS_CONFIG = {
 
 
 EVALUATION_DATASET = {
-    "dataset_name": "ethicalabs/Kurtis-E1-SFT",
+    "dataset_name": DATASET_NAME,
     "prompt_column": "question",
     "response_column": "answer",
     "dataset_max_samples": 500,

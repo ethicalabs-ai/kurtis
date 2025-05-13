@@ -4,10 +4,10 @@ import transformers
 from peft import PeftModel, prepare_model_for_kbit_training
 from trl import SFTTrainer
 
-from .dataset import load_dataset_from_config
-from .model import save_and_merge_model
-from .utils import free_unused_memory
-from .defaults import TrainingConfig
+from kurtis.dataset import load_dataset_from_config
+from kurtis.model import save_and_merge_model
+from kurtis.utils import free_unused_memory
+from kurtis.defaults import TrainingConfig
 
 
 def train_model(

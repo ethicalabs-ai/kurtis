@@ -2,7 +2,7 @@ import click
 
 from datasets import load_dataset, concatenate_datasets
 
-from .defaults import TrainingConfig
+from kurtis.defaults import TrainingConfig
 
 
 def _load_dataset(config: TrainingConfig, split: str = ""):
@@ -16,7 +16,7 @@ def _load_dataset(config: TrainingConfig, split: str = ""):
         split=split or config.dataset_split,
     )
 
-    if config.dataset_max_samples:
+    if config.dataset_max_samples and split != "validation":
         dataset = dataset.select(range(config.dataset_max_samples))
 
     return dataset

@@ -32,23 +32,23 @@ help:
 # Preprocess the dataset
 .PHONY: preprocessing
 preprocessing:
-	uv run $(PYTHON) -m $(MODULE) --preprocessing --config-module $(CONFIG_MODULE) --debug
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) dataset preprocessing
 
 # Train the model
 .PHONY: train
 train:
-	uv run $(PYTHON) -m $(MODULE) --train --config-module $(CONFIG_MODULE)
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model train
 
 # Eval the model
 .PHONY: eval_model
 eval_model:
-	uv run $(PYTHON) -m $(MODULE) --eval-model --config-module $(CONFIG_MODULE)
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model evaluate
 
 
 # Start a chat session
 .PHONY: chat
 chat:
-	uv run $(PYTHON) -m $(MODULE) --chat --config-module $(CONFIG_MODULE)
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model chat
 
 # Install dependencies
 .PHONY: install
@@ -91,8 +91,8 @@ docker_run:
 # Docker train inside the container
 .PHONY: docker_train
 docker_train:
-	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --train --config-module $(CONFIG_MODULE)
+	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --config-module $(CONFIG_MODULE) model train
 # Docker chat session inside the container
 .PHONY: docker_chat
 docker_chat:
-	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --chat --config-module $(CONFIG_MODULE)
+	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --config-module $(CONFIG_MODULE) model chat

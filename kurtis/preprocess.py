@@ -4,10 +4,10 @@ import torch
 
 from datasets import concatenate_datasets
 
-from .dataset import load_dataset_from_config
-from .model import load_model_and_tokenizer
-from .defaults import TrainingConfig
-from .utils import clean_and_truncate
+from kurtis.dataset import load_dataset_from_config
+from kurtis.model import load_model_and_tokenizer
+from kurtis.defaults import TrainingConfig
+from kurtis.utils import clean_and_truncate
 
 
 # Load all datasets
