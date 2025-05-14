@@ -90,6 +90,7 @@ def save_and_merge_model(
     )
     model = model.merge_and_unload()
     model.save_pretrained(output_merged_dir, safe_serialization=True)
+    tokenizer.save_pretrained(output_merged_dir)
     if push and hf_repo_id:
         model.push_to_hub(hf_repo_id, "Upload model")
         tokenizer.push_to_hub(hf_repo_id, "Upload tokenizer")

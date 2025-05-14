@@ -32,7 +32,7 @@ class TrainingConfig:
     logging_steps: int = 10
     lr: float = 3e-4
     lr_scheduler_type: str = "cosine"
-    optim: str = "paged_adamw_8bit"
+    optim: str = "adamw_torch"
     weight_decay: float = 2e-2
     accumulation_steps: int = 8
     final_checkpoint_name: str = "final_checkpoint"

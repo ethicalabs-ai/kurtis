@@ -189,7 +189,7 @@ def train_dpo_model(
     )
     trainer = DPOTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=dataset,
         args=dpo_config,
         peft_config=config.LORA_CONFIG,

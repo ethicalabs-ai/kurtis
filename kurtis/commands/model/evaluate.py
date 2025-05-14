@@ -7,7 +7,6 @@
 import os
 import click
 
-from kurtis.utils import get_device
 from kurtis.model import load_model_and_tokenizer
 from kurtis.evaluate import evaluate_main
 

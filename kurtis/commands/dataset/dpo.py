@@ -5,6 +5,7 @@
 #             creators.
 # -----------------------------------------------------------------------
 
+import os
 import click
 
 from kurtis.train_dpo import generate_dpo_dataset, clean_dpo_dataset
@@ -36,5 +37,4 @@ def handle_generate_dpo(debug=False):
 @click.pass_context
 def command(ctx, max_seq_length, push):
     debug = ctx.obj["DEBUG"]
-    config = ctx.obj["CONFIG"]
     handle_generate_dpo(debug=debug)

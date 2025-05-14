@@ -1,4 +1,4 @@
-from kurtis.default import *  # noqa: F403
+from .default import *  # noqa: F403
 from peft import LoraConfig, TaskType
 
 
@@ -30,6 +30,8 @@ TRAINING_CONFIG = {
     "dataset_name": "ethicalabs/Kurtis-E1-SFT",
     "dataset_split": "train",
     "dataset_max_samples": 10000,
+    "prompt_column": "question",
+    "response_column": "answer",
     "max_length": 1024,
     "num_train_epochs": 2,
     "warmup_ratio": 0.2,

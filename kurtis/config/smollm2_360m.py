@@ -1,4 +1,4 @@
-from kurtis.default import *  # noqa: F403
+from .default import *  # noqa: F403
 from peft import LoraConfig, TaskType
 
 

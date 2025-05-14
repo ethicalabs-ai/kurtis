@@ -7,9 +7,9 @@
 import os
 import click
 
-from kurtis.train import train_model
 from kurtis.utils import get_device
-from kurtis.model import load_model_and_tokenizer
+from kurtis.defaults import TrainingConfig
+from kurtis.model import load_model_and_tokenizer, save_and_merge_model
 
 
 # Suppress tokenizer parallelism warnings
@@ -44,7 +44,7 @@ def handle_train(
     )
 
 
-@click.command(name="train")
+@click.command(name="merge")
 @click.option(
     "--output-dir",
     default="./output/models",
@@ -56,11 +56,23 @@ def command(ctx, output_dir, push_model):
     config = ctx.obj["CONFIG"]
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
-
-    # Common model paths
     model_name = config.TRANSFORMERS_MODEL_PRETRAINED
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
-    output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
-    handle_train(
-        config, model_name, model_dirname, output_merged_dir, output_dir, push_model
+    # Common model paths
+    _, tokenizer = load_model_and_tokenizer(
+        config,
+        model_name=model_name,
+        model_output=model_dirname,
+    )
+    cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
+    final_checkpoint_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
+    final_output_merged_dir = os.path.join(
+        model_dirname, cfg.final_merged_checkpoint_name
+    )
+    save_and_merge_model(
+        final_checkpoint_dir,
+        final_output_merged_dir,
+        config.CHAT_TEMPLATE,
+        config.HF_REPO_ID,
+        push_model,
     )
