@@ -16,11 +16,11 @@ LORA_CONFIG = LoraConfig(
     lora_dropout=0.05,
     target_modules=[
         "down_proj",
-        "gate_proj",
+        # "gate_proj",
         "up_proj",
         # "k_proj",
         "o_proj",
-        "q_proj",
+        # "q_proj",
         # "v_proj",
     ],
     bias="none",

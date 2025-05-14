@@ -56,7 +56,6 @@ def train_model(
         model=model,
         train_dataset=train_loader,
         eval_dataset=eval_loader,
-        max_seq_length=cfg.max_length,
         args=transformers.TrainingArguments(
             per_device_train_batch_size=cfg.batch_size,
             gradient_checkpointing=cfg.checkpointing,
