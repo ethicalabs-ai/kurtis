@@ -13,7 +13,7 @@ from kurtis.defaults import TrainingConfig
 from kurtis.train_dpo import train_dpo_model
 
 
-def handle_train_dpo(config, model_name, model_dirname, output_dir, push_model):
+def handle_train_dpo(config, output_dir, push_model):
     """
     Handle the DPO model training process, including loading data,
     training, and optional pushing to Hugging Face.
@@ -36,6 +36,7 @@ def handle_train_dpo(config, model_name, model_dirname, output_dir, push_model):
     model, tokenizer = load_model_and_tokenizer(
         config,
         model_name=model_name,
+        model_output=os.path.join(output_dir, config.MODEL_NAME),
     )
 
     click.echo("Starting DPO training process...")

@@ -20,6 +20,7 @@ def handle_chat(config, model_dirname):
         config,
         model_name=config.INFERENCE_MODEL,
         model_output=model_dirname,
+        checkpoint_name="dpo_final_merged_checkpoint",
     )
     model.eval()  # Set the model to evaluation mode
     click.echo("Kurtis is ready. Type 'exit' to stop.")
@@ -35,11 +36,11 @@ def handle_chat(config, model_dirname):
 @click.option(
     "--output-dir",
     "-o",
-    default="./output",
+    default="./output/models",
     help="Directory to save or load the model and checkpoints.",
 )
 @click.pass_context
 def command(ctx, output_dir):
     config = ctx.obj["CONFIG"]
-    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
     handle_chat(config, model_dirname)
