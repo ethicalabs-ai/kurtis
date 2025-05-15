@@ -10,6 +10,7 @@ import click
 from kurtis.utils import get_device
 from kurtis.defaults import TrainingConfig
 from kurtis.model import load_model_and_tokenizer, save_and_merge_model
+from kurtis.train import train_model
 
 
 # Suppress tokenizer parallelism warnings
