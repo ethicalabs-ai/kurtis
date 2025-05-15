@@ -11,10 +11,10 @@ from peft import LoraConfig, TaskType
 TRANSFORMERS_MODEL_PRETRAINED = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
 DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "ethicalabs/Kurtis-E1-SmolLM2-1.7B-Instruct"
-MODEL_NAME = "Kurtis-SmolLM2-1.7B-Instruct"
-MODEL_DPO_NAME = "Kurtis-SmolLM2-1.7B-Instruct-DPO"
-HF_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct"
-HF_DPO_REPO_ID = "ethicalabs/Kurtis-SmolLM2-1.7B-Instruct-DPO"
+MODEL_NAME = "Kurtis-E1.1-SmolLM2-1.7B-Instruct"
+MODEL_DPO_NAME = "Kurtis-E1.1-SmolLM2-1.7B-Instruct-DPO"
+HF_REPO_ID = "ethicalabs/Kurtis-E1.1-SmolLM2-1.7B-Instruct"
+HF_DPO_REPO_ID = "ethicalabs/Kurtis-E1.1-SmolLM2-1.7B-Instruct-DPO"
 DATASET_NAME = "ethicalabs/Kurtis-E1-SFT"
 DPO_DATASET_NAME = "mrs83/kurtis_mental_health_dpo"
 OPENAI_API_URL = "http://localhost:11434/v1"
@@ -296,17 +296,17 @@ DPO_DATASETS = {"datasets/kurtis_mental_health_dpo_clean": DPO_DATASET_NAME}
 
 LORA_CONFIG = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=24,
-    lora_alpha=48,
-    lora_dropout=0.05,
+    r=12,
+    lora_alpha=24,
+    lora_dropout=0.0075,
     target_modules=[
         "down_proj",
         "gate_proj",
         "up_proj",
-        "k_proj",
+        # "k_proj",
         "o_proj",
-        "q_proj",
-        "v_proj",
+        # "q_proj",
+        # "v_proj",
     ],
     bias="none",
     use_dora=True,
