@@ -15,8 +15,9 @@ from kurtis.preprocess import preprocessing_main
 @click.option("--max-seq-length", default=1024, help="Max sequence length.")
 @click.option("--push", is_flag=True, help="Push dataset to Hugging Face.")
 @click.option("--dataset-config", help="Path to YAML dataset config.")
+@click.option("--model-name", help="Model name to use for tokenizer (overrides config).")
 @click.pass_context
-def command(ctx, max_seq_length, push, dataset_config):
+def command(ctx, max_seq_length, push, dataset_config, model_name):
     debug = ctx.obj["DEBUG"]
     config = ctx.obj["CONFIG"]
     preprocessing_main(
@@ -25,4 +26,5 @@ def command(ctx, max_seq_length, push, dataset_config):
         push=push,
         debug=debug,
         dataset_config_path=dataset_config,
+        model_name=model_name,
     )

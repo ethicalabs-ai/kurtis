@@ -9,6 +9,7 @@ OUTPUT_DIR = output
 IMAGE_NAME = kurtis:latest
 DOCKER_REGISTRY = ethicalabs/kurtis
 CONFIG_MODULE = kurtis.config.default
+MODEL_NAME = mrs83/Kurtis-SmolLM2-360M-Instruct
 
 # Default target
 .PHONY: all
@@ -32,17 +33,17 @@ help:
 # Preprocess the dataset
 .PHONY: preprocessing
 preprocessing:
-	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) dataset preprocessing
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) dataset preprocess --dataset-config datasets.yaml
 
 # Train the model
 .PHONY: train
 train:
-	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model train
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model train --dataset-config datasets.yaml
 
 # Eval the model
 .PHONY: eval_model
 eval_model:
-	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model evaluate
+	uv run $(PYTHON) -m $(MODULE) --config-module $(CONFIG_MODULE) model evaluate --dataset-config datasets.yaml --model-name $(MODEL_NAME)
 
 
 # Start a chat session

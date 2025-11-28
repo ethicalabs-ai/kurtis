@@ -61,12 +61,7 @@ def handle_train(
 def command(ctx, output_dir, push, model_name, dataset_config):
     config = ctx.obj["CONFIG"]
 
-    # MPS Safety Check
-    if torch.backends.mps.is_available():
-        click.echo(
-            "Warning: MPS detected. Skipping actual training execution as requested for testing."
-        )
-        return
+
 
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)

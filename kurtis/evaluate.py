@@ -114,12 +114,18 @@ def evaluate_main(
     debug=False,
     batch_size=8,
     eval_ratio=0.25,
+    dataset_config_path=None,
 ):
     click.echo("Starting evaluation process...")
 
     # Load datasets from config
-    click.echo("Testing on kurtis dataset")
-    dataset = load_dataset_from_config(config.EVALUATION_DATASET)
+    if dataset_config_path:
+        from kurtis.dataset import load_datasets_from_yaml
+        click.echo(f"Loading datasets from {dataset_config_path}")
+        dataset = load_datasets_from_yaml(dataset_config_path)
+    else:
+        click.echo("Testing on kurtis dataset")
+        dataset = load_dataset_from_config(config.EVALUATION_DATASET)
 
     val_dataset = dataset.select(range(max(1, int(eval_ratio * len(dataset)))))
 

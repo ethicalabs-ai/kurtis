@@ -56,8 +56,14 @@ def handle_chat(config, model_dirname, model_path=None):
     "--model-path",
     help="Path to the model to chat with (overrides default).",
 )
+@click.option(
+    "--model-name",
+    help="Model name to chat with (alias for --model-path).",
+)
 @click.pass_context
-def command(ctx, output_dir, model_path):
+def command(ctx, output_dir, model_path, model_name):
     config = ctx.obj["CONFIG"]
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
-    handle_chat(config, model_dirname, model_path)
+    # Prefer model_name if provided, otherwise model_path
+    final_model_path = model_name or model_path
+    handle_chat(config, model_dirname, final_model_path)

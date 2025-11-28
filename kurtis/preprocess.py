@@ -61,16 +61,15 @@ def process_dataset(dataset, split_ratio=0.05):
 
 
 def preprocessing_main(
-    config, max_length=512, push=False, debug=False, dataset_config_path=None
+    config, max_length=512, push=False, debug=False, dataset_config_path=None, model_name=None
 ):
     nltk.download("punkt")
     nltk.download("punkt_tab")
     if not torch.cuda.is_available():
         click.echo("CUDA is required to run data augmentation on initial dataset.")
 
-    _, tokenizer = load_model_and_tokenizer(
-        config, config.PREPROCESSING_TOKENIZER_MODEL
-    )
+    tokenizer_model = model_name or config.PREPROCESSING_TOKENIZER_MODEL
+    _, tokenizer = load_model_and_tokenizer(config, tokenizer_model)
 
     initial_dataset = prepare_initial_dataset(
         config, tokenizer, max_length, dataset_config_path
