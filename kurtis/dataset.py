@@ -1,6 +1,7 @@
 import click
 
 from datasets import load_dataset, concatenate_datasets
+import yaml
 
 from kurtis.defaults import TrainingConfig
 
@@ -28,6 +29,9 @@ def load_dataset_from_config(config: TrainingConfig, split: str = ""):
     Applies optional filtering based on 'dataset_select' rules.
     Returns questions and answers separately for QA training.
     """
+    if config.dataset_config_path:
+        return load_datasets_from_yaml(config.dataset_config_path)
+
     original_dataset = _load_dataset(config, split=split)
 
     if config.dataset_select:
@@ -82,3 +86,84 @@ def filter_dataset_by_rule(dataset, select_rule):
         filtered_ds = filtered_ds.select(range(min(len(filtered_ds), max_samples)))
 
     return filtered_ds
+
+
+def load_datasets_from_yaml(yaml_path: str):
+    """
+    Load and merge datasets defined in a YAML configuration file.
+    """
+    with open(yaml_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    datasets = []
+    for ds_config in config.get("datasets", []):
+        path = ds_config.get("path")
+        ds_type = ds_config.get("type", "huggingface")
+        split = ds_config.get("split", "train")
+        subset = ds_config.get("subset")
+
+        print(f"Loading dataset: {path} ({ds_type})")
+
+        if ds_type == "huggingface":
+            ds = load_dataset(path, subset, split=split)
+        elif ds_type == "jsonl" or ds_type == "json":
+            ds = load_dataset("json", data_files=path, split=split)
+        elif ds_type == "parquet":
+            ds = load_dataset("parquet", data_files=path, split=split)
+        else:
+            print(f"Warning: Unknown dataset type {ds_type} for {path}. Skipping.")
+            continue
+
+        # Rename columns if specified
+        prompt_col = ds_config.get("prompt_column", "question")
+        response_col = ds_config.get("response_column", "answer")
+
+        # Standardize columns
+        if prompt_col != "question" or response_col != "answer":
+            # Check for collisions and drop existing columns if they are not the target
+            if "question" in ds.column_names and prompt_col != "question":
+                ds = ds.remove_columns(["question"])
+            if "answer" in ds.column_names and response_col != "answer":
+                ds = ds.remove_columns(["answer"])
+
+            ds = ds.rename_columns({prompt_col: "question", response_col: "answer"})
+
+        # Add metadata
+        ds = ds.map(
+            lambda x: {
+                "dataset_name": path,
+                "dataset_domain": ds_config.get("domain", "general"),
+            }
+        )
+
+        # Apply filtering if specified
+        select_rules = ds_config.get("select", [])
+        if select_rules:
+            filtered_datasets = []
+            for rule in select_rules:
+                # Make a copy of the original dataset for each rule
+                dataset_copy = ds.select(range(len(ds)))
+                filtered_ds = filter_dataset_by_rule(dataset_copy, rule)
+                if len(filtered_ds) > 0:
+                    print(f"Info: rule {rule.get('classes')} returned data.")
+                    filtered_datasets.append(filtered_ds)
+                else:
+                    print(f"Warning: rule {rule.get('classes')} returned no data.")
+
+            if filtered_datasets:
+                ds = concatenate_datasets(filtered_datasets)
+            else:
+                print(
+                    "Warning: All rules returned empty datasets; using the full dataset."
+                )
+
+        # Keep only necessary columns
+        keep_cols = ["question", "answer", "dataset_name", "dataset_domain"]
+        ds = ds.remove_columns([c for c in ds.column_names if c not in keep_cols])
+
+        datasets.append(ds)
+
+    if not datasets:
+        raise ValueError("No datasets loaded.")
+
+    return concatenate_datasets(datasets)

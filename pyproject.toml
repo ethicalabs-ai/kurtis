@@ -1,7 +1,9 @@
 [project]
 name = "kurtis"
 version = "0.1.1"
-authors = ["Massimo R. Scamarcia <massimo.scamarcia@gmail.com>"]
+authors = [
+    {name = "Massimo R. Scamarcia", email = "massimo.scamarcia@gmail.com"},
+]
 description = "Kurtis SLM Toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,6 +36,7 @@ dependencies = [
     "openai>=1.76.0",
     "python-slugify>=8.0.4",
     "huggingface-hub[hf-xet]>=0.30.2",
+    "pyyaml>=6.0.2",
 ]
 
 [tool.uv.sources]
@@ -53,4 +56,13 @@ dev = [
 
 [[package]]
 name = "kurtis"
-version = "0.1.1"
+version = "0.1.2"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kurtis"]
+exclude = ["results*", "data*"]

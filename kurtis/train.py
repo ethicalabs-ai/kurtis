@@ -13,10 +13,13 @@ from kurtis.defaults import TrainingConfig
 def train_model(
     model,
     tokenizer,
-    config,
+    training_config,
+    lora_config,
     output_dir,
     model_output,
-    push=True,
+    push=False,
+    hf_repo_id=None,
+    qa_instruction=None,
     load_func=load_dataset_from_config,
 ):
     """
@@ -29,7 +32,7 @@ def train_model(
             prompt = [
                 {
                     "role": "system",
-                    "content": config.QA_INSTRUCTION,
+                    "content": qa_instruction or "Answer the following question.",
                 },
                 {"role": "user", "content": example["question"][i]},
                 {"role": "assistant", "content": example["answer"][i]},
@@ -39,8 +42,11 @@ def train_model(
         return output_texts
 
     # Configuration parameters
-    cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
-    model_dirname = os.path.join(output_dir, config.MODEL_NAME)
+    cfg = TrainingConfig.from_dict(training_config)
+    model_dirname = model_output  # Use passed model_output directly as dirname if appropriate, or keep logic.
+    # The original code used os.path.join(output_dir, config.MODEL_NAME) but model_output was passed as run_name.
+    # Let's respect the passed model_output as the directory name for consistency with new CLI.
+    model_dirname = model_output
     final_checkpoint_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
     final_output_merged_dir = os.path.join(
         model_dirname, cfg.final_merged_checkpoint_name
@@ -75,7 +81,7 @@ def train_model(
             run_name=model_output,
             save_strategy="epoch",
         ),
-        peft_config=config.LORA_CONFIG,
+        peft_config=lora_config,
         formatting_func=formatting_prompts_func,
     )
 
@@ -85,18 +91,18 @@ def train_model(
 
     # Save adapter model
     # Adapted from: https://github.com/huggingface/smollm/blob/main/finetune/train.py
-    model = PeftModel(model, peft_config=config.LORA_CONFIG)
+    model = PeftModel(model, peft_config=lora_config)
     trainer.save_model(final_checkpoint_dir)
-    if push:
-        model.push_to_hub(f"{config.HF_REPO_ID}-PEFT", "Upload adapter")
+    if push and hf_repo_id:
+        model.push_to_hub(f"{hf_repo_id}-PEFT", "Upload adapter")
     del model
     free_unused_memory()
-    chat_template = getattr(config, "CHAT_TEMPLATE", "")
+    chat_template = getattr(cfg, "chat_template", "")
     # Save final model
     save_and_merge_model(
         final_checkpoint_dir,
         final_output_merged_dir,
         chat_template=chat_template,
-        hf_repo_id=config.HF_REPO_ID,
+        hf_repo_id=hf_repo_id,
         push=push,
     )

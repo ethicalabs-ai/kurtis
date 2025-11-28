@@ -3,7 +3,7 @@ from peft import LoraConfig, TaskType
 
 
 TRANSFORMERS_MODEL_PRETRAINED = "Qwen/Qwen2.5-0.5B-Instruct"
-DATA_AUGMENTATION_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
+PREPROCESSING_TOKENIZER_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 INFERENCE_MODEL = "ethicalabs/Kurtis-E1.1-Qwen2.5-0.5B-Instruct"
 MODEL_NAME = "Kurtis-E1.1-Qwen2.5-0.5B-Instruct"
 MODEL_DPO_NAME = "Kurtis-E1.1-Qwen2.5-0.5B-Instruct-DPO"

@@ -52,8 +52,55 @@ uv run -m kurtis --config-module kurtis.config.default model train
 To start a conversation with the Kurtis model:
 
 ```bash
+uv run -m kurtis --config-module kurtis.config.default model train --dataset-config datasets.yaml
+```
+
+#### Start a Chat Session
+
+To start a conversation with the Kurtis model:
+
+```bash
 uv run -m kurtis --config-module kurtis.config.default model chat
 ```
+
+### Dataset Configuration
+
+You can define your training datasets in a YAML file (e.g., `datasets.yaml`). This allows for flexible composition of datasets from Hugging Face, local files, or other sources.
+
+**Example `datasets.yaml`:**
+
+```yaml
+datasets:
+  - path: "mrs83/kurtis_mental_health_initial"
+    split: "train"
+    type: "huggingface"
+    prompt_column: "question"
+    response_column: "answer"
+    domain: "mental-health"
+  - path: "tellikoroma/mentalhealth"
+    split: "train"
+    type: "huggingface"
+    prompt_column: "pattern"
+    response_column: "response"
+    domain: "mental-health"
+    select:
+      - classes:
+          - "tag:greeting"
+          - "tag:morning"
+        max_samples: 1000
+```
+
+**Supported Fields:**
+
+- `path`: Dataset path (Hugging Face hub ID or local path).
+- `type`: `huggingface`, `jsonl`, `json`, or `parquet`.
+- `split`: Dataset split to load (default: `train`).
+- `prompt_column`: Column name for the user prompt.
+- `response_column`: Column name for the assistant response.
+- `domain`: Domain tag for the dataset.
+- `select`: Optional list of filtering rules.
+    - `classes`: List of strings to filter by (checks if any column value matches `key:value` or just value).
+    - `max_samples`: Maximum number of samples to keep for this rule.
 
 ### Command-Line Options
 
