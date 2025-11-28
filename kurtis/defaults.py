@@ -40,6 +40,7 @@ class TrainingConfig:
     dpo_final_checkpoint_name: str = "dpo_final_checkpoint"
     dpo_final_merged_checkpoint_name: str = "dpo_final_merged_checkpoint"
     dataset_select: List[Dict] = field(default_factory=list)
+    dataset_config_path: str = ""
 
     @classmethod
     def from_dict(cls, cfg: dict):

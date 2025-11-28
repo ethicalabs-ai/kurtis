@@ -68,6 +68,7 @@ def load_model_and_tokenizer(
         device_map="auto",
         quantization_config=bnb_config,
         torch_dtype=torch_dtype,
+        attn_implementation="eager",
     )
     return model, tokenizer
 
