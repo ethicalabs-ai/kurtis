@@ -41,15 +41,7 @@ You can interact with Kurtis by either training the model or starting a chat ses
 
 #### Train the Model
 
-To train the model using the provided configuration:
-
-```bash
-uv run -m kurtis --config-module kurtis.config.default model train
-```
-
-#### Start a Chat Session
-
-To start a conversation with the Kurtis model:
+To train the model using the provided configuration and dataset:
 
 ```bash
 uv run -m kurtis --config-module kurtis.config.default model train --dataset-config datasets.yaml
@@ -60,7 +52,15 @@ uv run -m kurtis --config-module kurtis.config.default model train --dataset-con
 To start a conversation with the Kurtis model:
 
 ```bash
-uv run -m kurtis --config-module kurtis.config.default model chat
+uv run -m kurtis --config-module kurtis.config.default model chat --model-name mrs83/Kurtis-SmolLM2-360M-Instruct
+```
+
+#### Evaluate the Model
+
+To evaluate the model:
+
+```bash
+uv run -m kurtis --config-module kurtis.config.default model evaluate --dataset-config datasets.yaml --model-name mrs83/Kurtis-SmolLM2-360M-Instruct
 ```
 
 ### Dataset Configuration
