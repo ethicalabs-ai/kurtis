@@ -32,8 +32,28 @@ Kurtis final model allows users to ask questions related to mental health topics
 ### Prerequisites
 
 - [uv](https://github.com/astral-sh/uv) A tool for Python dependency management.
-- **Python 3.10 or higher**.
+- **Python 3.12 or higher**.
 - Docker (optional, if you plan to use Docker).
+
+### Installation
+
+#### Standard Installation (CPU-only)
+
+```bash
+uv sync
+```
+
+This installs dependencies without PyTorch (use this for development without GPU acceleration).
+
+#### ROCm GPU Support
+
+For AMD GPUs with ROCm 7.0 support:
+
+```bash
+uv sync --group rocm --allow-insecure-host download.pytorch.org
+```
+
+This installs PyTorch 2.10.0+ with ROCm 7.0 nightly builds for AMD GPU acceleration.
 
 ### Usage
 
