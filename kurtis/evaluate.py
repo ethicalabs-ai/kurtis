@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from tqdm import tqdm
 
 from kurtis.dataset import load_dataset_from_config
+from kurtis.defaults import TrainingConfig
 from kurtis.inference import batch_inference
 from kurtis.utils import get_device
 
@@ -15,7 +16,15 @@ device = get_device()
 
 
 def evaluate_model(
-    model, tokenizer, config, dataset, max_length=2048, debug=False, batch_size=16
+    model,
+    tokenizer,
+    config,
+    dataset,
+    max_length=2048,
+    debug=False,
+    batch_size=16,
+    prompt_col="prompt",
+    response_col="completion",
 ):
     """
     Evaluate the model on the validation set with attention masks.
@@ -35,12 +44,20 @@ def evaluate_model(
         for batch_start in range(0, total, batch_size):
             batch_end = min(batch_start + batch_size, total)
             batch = dataset.select(range(batch_start, batch_end))
-            input_texts = [example["question"] for example in batch]
-            labels = [example["answer"] for example in batch]
+            input_texts = [example[prompt_col] for example in batch]
+            labels = [example[response_col] for example in batch]
 
             predictions = batch_inference(
                 model, tokenizer, config, input_texts, max_length=max_length
             )
+
+            if debug and batch_start == 0:
+                print("\n--- DEBUG: First 3 Examples ---")
+                for k in range(min(3, len(predictions))):
+                    print(f"\nQ: {input_texts[k]}")
+                    print(f"Ref: {labels[k]}")
+                    print(f"Pred: {predictions[k]}")
+                print("-------------------------------\n")
             all_preds.extend(predictions)
             all_labels.extend(labels)
             all_inputs.extend(input_texts)
@@ -97,7 +114,7 @@ def evaluate_model(
 
     # Print some examples of questions, expected answers, and generated answers
     for i in range(min(10, len(all_preds))):
-        click.echo("\nExample {}:".format(i + 1))
+        click.echo(f"\nExample {i + 1}:")
         click.echo(f"  Question: {all_inputs[i]}")
         click.echo(f"  Expected Answer: {all_labels[i]}")
         click.echo(f"  Generated Answer: {all_preds[i]}")
@@ -118,10 +135,13 @@ def evaluate_main(
     click.echo("Starting evaluation process...")
 
     # Load datasets from config
-    click.echo("Testing on kurtis dataset")
-    dataset = load_dataset_from_config(config.EVALUATION_DATASET)
-
+    click.echo("Testing on kurtis dataset (from config)")
+    eval_dataset_config = TrainingConfig.from_dict(config.EVALUATION_DATASET)
+    dataset = load_dataset_from_config(eval_dataset_config)
     val_dataset = dataset.select(range(max(1, int(eval_ratio * len(dataset)))))
+
+    prompt_col = config.EVALUATION_DATASET.get("prompt_column", "prompt")
+    response_col = config.EVALUATION_DATASET.get("response_column", "completion")
 
     # Evaluate the model
     click.echo("Evaluating the model...")
@@ -130,6 +150,8 @@ def evaluate_main(
         tokenizer,
         config,
         val_dataset,
+        prompt_col=prompt_col,
+        response_col=response_col,
         max_length=max_length,
         debug=debug,
         batch_size=batch_size,

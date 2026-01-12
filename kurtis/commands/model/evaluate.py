@@ -5,10 +5,11 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 
-from kurtis.model import load_model_and_tokenizer
 from kurtis.evaluate import evaluate_main
+from kurtis.model import load_model_and_tokenizer
 
 
 def handle_evaluation(config, model_dirname):

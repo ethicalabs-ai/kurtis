@@ -5,11 +5,12 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 
-from kurtis.ui import start_chat_wrapper
-from kurtis.model import load_model_and_tokenizer
 from kurtis.inference import inference_model
+from kurtis.model import load_model_and_tokenizer
+from kurtis.ui import start_chat_wrapper
 
 
 def handle_chat(config, model_dirname, model_path=None):

@@ -5,11 +5,12 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 
 from datasets import load_dataset
-from kurtis.model import load_model_and_tokenizer
 from kurtis.defaults import TrainingConfig
+from kurtis.model import load_model_and_tokenizer
 from kurtis.train_dpo import train_dpo_model
 
 

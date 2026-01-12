@@ -61,18 +61,39 @@ You can interact with Kurtis by either training the model or starting a chat ses
 
 #### Train the Model
 
+### Preprocessing
+
+Before training, preprocess the dataset to apply the chat template formatting:
+
+```bash
+uv run kurtis --config-module kurtis.config.default model preprocess --output-path ./processed_dataset
+```
+
+This will:
+- Load the dataset specified in the config
+- Apply the model's chat template to format conversations
+- Save the preprocessed dataset to the specified path (default: `./processed_dataset/`)
+
+### Training
+
 To train the model using the provided configuration and dataset:
 
 ```bash
-uv run -m kurtis --config-module kurtis.config.default model train --dataset-config datasets.yaml
+uv run kurtis --config-module kurtis.config.default model train --output-dir ./kurtis-v1 --no-push --preprocessed-dataset-path ./processed_dataset
 ```
+
+**Note:** The training script will automatically use the preprocessed dataset from the specified path if it exists. If not found, it will fall back to loading the dataset from the source (as specified in the config) and apply the chat template on-the-fly during training.
 
 #### Start a Chat Session
 
-To start a conversation with the Kurtis model:
+To start a conversation with a trained Kurtis model:
 
 ```bash
-uv run -m kurtis --config-module kurtis.config.default model chat --model-name mrs83/Kurtis-SmolLM2-360M-Instruct
+# Using a local trained model
+uv run kurtis --config-module kurtis.config.default model chat --model-path ./kurtis-v1/Kurtis-Granite-4.0-350m-Instruct/final_merged_checkpoint
+
+# Or using a model from Hugging Face Hub
+uv run kurtis --config-module kurtis.config.default model chat --model-path mrs83/Kurtis-SmolLM2-360M-Instruct
 ```
 
 #### Evaluate the Model
@@ -80,7 +101,7 @@ uv run -m kurtis --config-module kurtis.config.default model chat --model-name m
 To evaluate the model:
 
 ```bash
-uv run -m kurtis --config-module kurtis.config.default model evaluate --dataset-config datasets.yaml --model-name mrs83/Kurtis-SmolLM2-360M-Instruct
+uv run kurtis --config-module kurtis.config.default model evaluate --output-dir ./kurtis-v1
 ```
 
 ### Dataset Configuration
@@ -159,7 +180,6 @@ Options:
 Commands:
   dpo
   preprocess
-  translate
 
 $ uv run -m kurtis model --help
 ...
@@ -193,6 +213,24 @@ make docker_push    - Push the Docker image to the registry.
 make docker_run     - Run the Docker container with output mounted.
 make docker_train   - Run the training script inside the Docker container.
 make docker_chat    - Start a prompt session inside the Docker container.
+```
+
+### Docker ROCm (AMD GPU)
+
+For AMD GPU users, a separate Dockerfile is provided to support ROCm 7.1.
+
+**Build the ROCm image:**
+```bash
+docker build -f Dockerfile.rocm -t kurtis:rocm .
+```
+
+**Run training with ROCm:**
+```bash
+docker run -it --rm \
+    --device=/dev/kfd --device=/dev/dri \
+    --group-add video \
+    -v $(pwd)/output:/app/output \
+    kurtis:rocm model train
 ```
 
 ### Evaluation Results

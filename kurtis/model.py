@@ -1,9 +1,9 @@
 # kurtis/model.py
 import os
+
 import click
 import torch
-from typing import Optional, Tuple
-
+from peft import AutoPeftModelForCausalLM, PeftConfig
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -11,7 +11,6 @@ from transformers import (
     PreTrainedModel,
     PreTrainedTokenizer,
 )
-from peft import AutoPeftModelForCausalLM, PeftConfig
 
 # Determine torch data type based on CUDA capabilities.
 torch_dtype = (
@@ -32,10 +31,10 @@ bnb_config = (
 
 def load_model_and_tokenizer(
     config: object,
-    model_name: Optional[str] = None,
-    model_output: Optional[str] = None,
+    model_name: str | None = None,
+    model_output: str | None = None,
     checkpoint_name: str = "final_merged_checkpoint",
-) -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
+) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     """
     Load the model and tokenizer automatically, or use the model_name if provided.
 
@@ -57,12 +56,10 @@ def load_model_and_tokenizer(
     click.echo(f"Loading model and tokenizer: {model_name}")
     # Always load the tokenizer from the original pretrained model.
     tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(
-        getattr(config, "TRANSFORMERS_MODEL_PRETRAINED")
+        config.TRANSFORMERS_MODEL_PRETRAINED
     )
     tokenizer.pad_token = tokenizer.eos_token
-    chat_template = getattr(config, "CHAT_TEMPLATE", None)
-    if chat_template:
-        tokenizer.chat_template = chat_template
+    # Use model's built-in chat template
     model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto",
@@ -73,10 +70,38 @@ def load_model_and_tokenizer(
     return model, tokenizer
 
 
+def load_tokenizer_only(
+    config: object,
+    model_name: str | None = None,
+) -> PreTrainedTokenizer:
+    """
+    Load only the tokenizer without loading the model.
+
+    Args:
+        config: Configuration object with TRANSFORMERS_MODEL_PRETRAINED attribute.
+        model_name (str, optional): Name of the tokenizer to load. If not provided,
+                                   defaults to config.TRANSFORMERS_MODEL_PRETRAINED.
+
+    Returns:
+        PreTrainedTokenizer: The loaded tokenizer.
+    """
+    if not model_name:
+        model_name = getattr(config, "TRANSFORMERS_MODEL_PRETRAINED", None)
+        if model_name is None:
+            raise ValueError("Config must have TRANSFORMERS_MODEL_PRETRAINED attribute")
+
+    click.echo(f"Loading tokenizer: {model_name}")
+    tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token = tokenizer.eos_token
+    # Use model's built-in chat template
+
+    return tokenizer
+
+
 def save_and_merge_model(
     final_checkpoint_dir: str,
     output_merged_dir: str,
-    chat_template: str,
+    chat_template: str = None,  # Deprecated, kept for backward compatibility
     hf_repo_id: str = "",
     push: bool = True,
 ):
@@ -84,8 +109,7 @@ def save_and_merge_model(
     peft_config = PeftConfig.from_pretrained(final_checkpoint_dir)
     base_model_path = peft_config.base_model_name_or_path
     tokenizer = AutoTokenizer.from_pretrained(base_model_path)
-    if chat_template:
-        tokenizer.chat_template = chat_template
+    # Use model's built-in chat template (do not override)
     model = AutoPeftModelForCausalLM.from_pretrained(
         final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
     )

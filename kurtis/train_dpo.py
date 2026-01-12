@@ -1,18 +1,18 @@
 import os
 import re
-import torch
-import click
-from tqdm import tqdm
-from datasets import load_dataset, Dataset
-import pandas as pd
-from transformers import pipeline
-from transformers import AutoTokenizer
-from trl import DPOTrainer, DPOConfig
-from peft import PeftModel, prepare_model_for_kbit_training
 
+import click
+import pandas as pd
+import torch
+from peft import PeftModel, prepare_model_for_kbit_training
+from tqdm import tqdm
+from transformers import AutoTokenizer, pipeline
+from trl import DPOConfig, DPOTrainer
+
+from datasets import Dataset, load_dataset
+from kurtis.defaults import TrainingConfig
 from kurtis.model import save_and_merge_model
 from kurtis.utils import free_unused_memory
-from kurtis.defaults import TrainingConfig
 
 
 def generate_rejected_prompt(prompt: str, pipe, max_new_tokens=256, debug=False):
@@ -109,16 +109,12 @@ def clean_dpo_dataset(input_path: str, output_path: str, debug=False):
 
     if debug:
         print(f"Saved {len(matching_entries)} matching entries to {output_path}")
-        print(
-            f"Kept {len(non_matching_entries)} non-matching entries for further processing."
-        )
+        print(f"Kept {len(non_matching_entries)} non-matching entries for further processing.")
 
     return non_matching_entries
 
 
-def generate_dpo_dataset(
-    model, input_path: str, output_path: str, debug=False, force=False
-):
+def generate_dpo_dataset(model, input_path: str, output_path: str, debug=False, force=False):
     """
     Iterate over the dataset and generate rejected pairs, saving the output to a parquet file.
     """
@@ -144,9 +140,7 @@ def generate_dpo_dataset(
     ]
 
     # Convert to a Pandas DataFrame for saving
-    df = pd.DataFrame(
-        {"prompt": dataset["Context"], "chosen": chosen, "rejected": rejected}
-    )
+    df = pd.DataFrame({"prompt": dataset["Context"], "chosen": chosen, "rejected": rejected})
 
     # Save the new dataset as parquet
     output_dirname = os.path.dirname(output_path)
@@ -155,15 +149,11 @@ def generate_dpo_dataset(
     click.echo(f"Processed dataset saved to {output_path}")
 
 
-def train_dpo_model(
-    model, tokenizer, config, dataset, output_dir, model_output, push=False
-):
+def train_dpo_model(model, tokenizer, config, dataset, output_dir, model_output, push=False):
     cfg = TrainingConfig.from_dict(config.TRAINING_DPO_CONFIG)
     model_dirname = os.path.join(output_dir, config.MODEL_DPO_NAME)
     final_checkpoint_dir = os.path.join(model_dirname, cfg.dpo_final_checkpoint_name)
-    final_output_merged_dir = os.path.join(
-        model_dirname, cfg.dpo_final_merged_checkpoint_name
-    )
+    final_output_merged_dir = os.path.join(model_dirname, cfg.dpo_final_merged_checkpoint_name)
 
     model = prepare_model_for_kbit_training(model)
 
@@ -206,13 +196,10 @@ def train_dpo_model(
     del model
     free_unused_memory()
     click.echo(f"DPO model saved to {final_checkpoint_dir}")
-    # Save final model
-    chat_template = getattr(config, "CHAT_TEMPLATE", "")
-    # Save final model
+    # Save final model (will use model's built-in chat template)
     save_and_merge_model(
         final_checkpoint_dir,
         final_output_merged_dir,
-        chat_template=chat_template,
         hf_repo_id=config.HF_DPO_REPO_ID,
         push=push,
     )

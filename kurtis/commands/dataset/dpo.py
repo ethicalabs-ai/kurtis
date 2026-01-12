@@ -6,9 +6,10 @@
 # -----------------------------------------------------------------------
 
 import os
+
 import click
 
-from kurtis.train_dpo import generate_dpo_dataset, clean_dpo_dataset
+from kurtis.train_dpo import clean_dpo_dataset, generate_dpo_dataset
 
 
 def handle_generate_dpo(debug=False):

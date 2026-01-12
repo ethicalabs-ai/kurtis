@@ -5,13 +5,13 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 import torch
 
+from kurtis.model import load_model_and_tokenizer
 from kurtis.train import train_model
 from kurtis.utils import get_device
-from kurtis.model import load_model_and_tokenizer
-
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -20,7 +20,13 @@ device = get_device()
 
 
 def handle_train(
-    config, model_name, model_dirname, output_merged_dir, output_dir, push_model
+    config,
+    model_name,
+    model_dirname,
+    output_merged_dir,
+    output_dir,
+    push_model,
+    preprocessed_dataset_path,
 ):
     """
     Train and optionally push the model to Hugging Face if specified.
@@ -45,6 +51,7 @@ def handle_train(
         push=push_model,
         hf_repo_id=config.HF_REPO_ID,
         qa_instruction=config.QA_INSTRUCTION,
+        preprocessed_dataset_path=preprocessed_dataset_path,
     )
 
 
@@ -57,8 +64,13 @@ def handle_train(
 @click.option("--push/--no-push", default=False, help="Push model to Hugging Face.")
 @click.option("--model-name", help="Model name to use (overrides config).")
 @click.option("--dataset-config", help="Path to YAML dataset config.")
+@click.option(
+    "--preprocessed-dataset-path",
+    default="./processed_dataset",
+    help="Path to preprocessed dataset (if exists, will be used instead of loading from source)",
+)
 @click.pass_context
-def command(ctx, output_dir, push, model_name, dataset_config):
+def command(ctx, output_dir, push, model_name, dataset_config, preprocessed_dataset_path):
     config = ctx.obj["CONFIG"]
 
     # MPS Safety Check
@@ -83,4 +95,12 @@ def command(ctx, output_dir, push, model_name, dataset_config):
     model_name = config.TRANSFORMERS_MODEL_PRETRAINED
     model_dirname = os.path.join(output_dir, config.MODEL_NAME)
     output_merged_dir = os.path.join(model_dirname, "final_merged_checkpoint")
-    handle_train(config, model_name, model_dirname, output_merged_dir, output_dir, push)
+    handle_train(
+        config,
+        model_name,
+        model_dirname,
+        output_merged_dir,
+        output_dir,
+        push,
+        preprocessed_dataset_path,
+    )

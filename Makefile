@@ -10,6 +10,18 @@ IMAGE_NAME = kurtis:latest
 DOCKER_REGISTRY = ethicalabs/kurtis
 CONFIG_MODULE = kurtis.config.default
 
+# ROCm Detection
+AMD_SMI := $(shell which amd-smi 2>/dev/null)
+ifdef AMD_SMI
+    DOCKERFILE = Dockerfile.rocm
+    DOCKER_RUN_FLAGS = --device=/dev/kfd --device=/dev/dri --group-add video
+    $(info ROCm detected via amd-smi. Using Dockerfile.rocm)
+else
+    DOCKERFILE = Dockerfile
+    DOCKER_RUN_FLAGS =
+    $(info amd-smi not found. Using standard Dockerfile)
+endif
+
 # Default target
 .PHONY: all
 all: help
@@ -25,6 +37,7 @@ help:
 	@echo "  make docker_build   - Build the Docker image for the project."
 	@echo "  make docker_push    - Push the Docker image to the registry."
 	@echo "  make docker_run     - Run the Docker container with output mounted."
+	@echo "  make docker_preprocess - Run the preprocessing script inside the Docker container."
 	@echo "  make docker_train   - Run the training script inside the Docker container."
 	@echo "  make docker_chat    - Start a prompt session inside the Docker container."
 
@@ -75,7 +88,7 @@ clean:
 # Docker build
 .PHONY: docker_build
 docker_build:
-	docker build -t $(IMAGE_NAME) .
+	docker build -f $(DOCKERFILE) -t $(IMAGE_NAME) .
 
 # Docker push
 .PHONY: docker_push
@@ -86,13 +99,26 @@ docker_push:
 # Docker run with output mounted
 .PHONY: docker_run
 docker_run:
-	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME)
+	docker run --rm $(DOCKER_RUN_FLAGS) -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME)
+
+# Docker preprocess inside the container
+.PHONY: docker_preprocess
+docker_preprocess:
+	mkdir -p $(HOME)/.cache/huggingface
+	docker run --rm $(DOCKER_RUN_FLAGS) \
+		-v $(PWD)/$(OUTPUT_DIR):/app/output \
+		-v $(HOME)/.cache/huggingface:/home/kurtis/.cache/huggingface \
+		$(IMAGE_NAME) --config-module $(CONFIG_MODULE) dataset preprocess --output-path /app/output/processed_dataset
 
 # Docker train inside the container
 .PHONY: docker_train
 docker_train:
-	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --config-module $(CONFIG_MODULE) model train
+	mkdir -p $(HOME)/.cache/huggingface
+	docker run --rm $(DOCKER_RUN_FLAGS) \
+		-v $(PWD)/$(OUTPUT_DIR):/app/output \
+		-v $(HOME)/.cache/huggingface:/home/kurtis/.cache/huggingface \
+		$(IMAGE_NAME) --config-module $(CONFIG_MODULE) model train --preprocessed-dataset-path /app/output/processed_dataset
 # Docker chat session inside the container
 .PHONY: docker_chat
 docker_chat:
-	docker run --rm -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --config-module $(CONFIG_MODULE) model chat
+	docker run --rm $(DOCKER_RUN_FLAGS) -v $(PWD)/$(OUTPUT_DIR):/app/output $(IMAGE_NAME) --config-module $(CONFIG_MODULE) model chat

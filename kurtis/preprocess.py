@@ -2,9 +2,8 @@ import click
 import nltk
 import torch
 
-
 from kurtis.dataset import load_datasets_from_yaml
-from kurtis.model import load_model_and_tokenizer
+from kurtis.model import load_tokenizer_only
 from kurtis.utils import clean_and_truncate
 
 
@@ -61,23 +60,54 @@ def process_dataset(dataset, split_ratio=0.05):
 
 
 def preprocessing_main(
-    config, max_length=512, push=False, debug=False, dataset_config_path=None
+    config,
+    max_length=512,
+    push=False,
+    debug=False,
+    dataset_config_path=None,
+    output_path="./processed_dataset",
 ):
     nltk.download("punkt")
     nltk.download("punkt_tab")
     if not torch.cuda.is_available():
-        click.echo("CUDA is required to run data augmentation on initial dataset.")
+        click.echo("Warning: GPU (CUDA/ROCm) not detected. Data processing might be slow.")
+    else:
+        device_name = "ROCm" if torch.version.hip else "CUDA"
+        click.echo(f"Using {device_name} for processing.")
 
-    _, tokenizer = load_model_and_tokenizer(
-        config, config.PREPROCESSING_TOKENIZER_MODEL
-    )
+    # Load preprocessing tokenizer for text cleaning/truncation
+    preprocessing_tokenizer = load_tokenizer_only(config, config.PREPROCESSING_TOKENIZER_MODEL)
+
+    # Load training model tokenizer for chat template formatting
+    training_tokenizer = load_tokenizer_only(config, config.TRANSFORMERS_MODEL_PRETRAINED)
 
     initial_dataset = prepare_initial_dataset(
-        config, tokenizer, max_length, dataset_config_path
+        config, preprocessing_tokenizer, max_length, dataset_config_path
     )
     dataset = process_dataset(initial_dataset)
+
+    # Apply chat template formatting for SFT training using the TRAINING model's tokenizer
+    def format_with_chat_template(example):
+        """Apply chat template to create formatted text column"""
+        messages = [
+            {"role": "system", "content": config.QA_INSTRUCTION},
+            {"role": "user", "content": example["question"]},
+            {"role": "assistant", "content": example["answer"]},
+        ]
+        text = training_tokenizer.apply_chat_template(messages, tokenize=False)
+        return {"text": text}
+
+    print("Applying chat template formatting...")
+    dataset = dataset.map(format_with_chat_template, desc="Formatting with chat template")
+
+    print(f"Processed {len(dataset)} examples")
+    print(f"Sample formatted text:\n{dataset['train'][0]['text'][:200]}...")
+
+    # Save dataset
+    output_dataset = config.DATASET_NAME  # Assuming output_dataset should be config.DATASET_NAME
     if push:
-        dataset["train"].push_to_hub(config.DATASET_NAME, split="train")
-        dataset["test"].push_to_hub(config.DATASET_NAME, split="validation")
+        print(f"Pushing to Hub: {output_dataset}")
+        dataset.push_to_hub(output_dataset)
     else:
-        click.echo("Skipping push to Hub (use --push to push).")
+        print(f"Saving locally to: {output_path}")
+        dataset.save_to_disk(output_path)

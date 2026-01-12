@@ -26,9 +26,7 @@ def inference_model(
         # Ensure the model is on the correct device
         model.eval()
         input_text = tokenizer.apply_chat_template(messages, tokenize=False)
-        inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(
-            device
-        )
+        inputs = tokenizer.encode(f"{input_text}assistant\n", return_tensors="pt").to(device)
         with torch.no_grad():
             outputs = model.generate(
                 input_ids=inputs,
@@ -49,9 +47,7 @@ def inference_model(
     return response.strip() if response else fallback_response
 
 
-def batch_inference(
-    model, tokenizer, config, input_texts, instruction=None, max_length=512
-):
+def batch_inference(model, tokenizer, config, input_texts, instruction=None, max_length=512):
     """
     Generates responses from Kurtis for multiple input texts in a batch.
 
@@ -82,9 +78,10 @@ def batch_inference(
     ]
     inputs = [
         tokenizer.apply_chat_template(
-            messages + [{"role": "user", "content": text}], tokenize=False
+            messages + [{"role": "user", "content": text}],
+            tokenize=False,
+            add_generation_prompt=True,
         )
-        + "assistant\n"
         for text in input_texts
     ]
     encoded_inputs = tokenizer(
@@ -98,7 +95,7 @@ def batch_inference(
             temperature=0.4,
             top_p=0.9,
             top_k=50,
-            repetition_penalty=1.0,
+            repetition_penalty=1.2,
             do_sample=True,
             eos_token_id=tokenizer.eos_token_id,
         )

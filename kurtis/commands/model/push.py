@@ -5,6 +5,7 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 
 from kurtis.model import load_model_and_tokenizer

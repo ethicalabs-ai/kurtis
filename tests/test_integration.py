@@ -54,7 +54,7 @@ def test_evaluate_main_integration(mocker, mock_tokenizer, mock_model, tmp_path)
     # dataset.select -> val_dataset
     # val_dataset.select -> batch (list of dicts)
 
-    mock_batch = [{"question": "q", "answer": "a"}]
+    mock_batch = [{"prompt": "q", "completion": "a"}]
 
     mock_val_dataset = MagicMock()
     mock_val_dataset.__len__.return_value = 10
@@ -82,7 +82,11 @@ def test_evaluate_main_integration(mocker, mock_tokenizer, mock_model, tmp_path)
 
     # Mock config object
     mock_config = MagicMock()
-    mock_config.EVALUATION_DATASET = {"dataset_name": "test_ds"}
+    mock_config.EVALUATION_DATASET = {
+        "dataset_name": "test_ds",
+        "prompt_column": "prompt",
+        "response_column": "completion",
+    }
     mock_config.MODEL_NAME = "test_model"
 
     # Run evaluation

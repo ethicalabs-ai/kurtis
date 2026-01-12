@@ -6,10 +6,11 @@
 # --------------------------------------------------------------------
 # From: https://stackoverflow.com/questions/50751040/include-submodules-on-click
 
-import click
 import importlib
-import pkgutil
 import os.path
+import pkgutil
+
+import click
 
 from kurtis.utils import load_config, print_kurtis_title
 
