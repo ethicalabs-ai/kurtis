@@ -2,9 +2,7 @@
 
 **Kurtis** is an experimental fine-tuning, evaluation and inference tool for [Kurtis E1](https://huggingface.co/collections/ethicalabs/kurtis-e1-67a9148e0836885c44c7902c).
 
-![Kurtis E1 in action](images/screenshots/kurtis.png)
-
-Kurtis is a mental-health AI assistant designed with empathy at its core.
+Kurtis is aN assistant designed with empathy at its core.
 
 Unlike other AI models that aim for peak efficiency, Kurtis prioritizes understanding, emotional nuance, and meaningful conversations.
 
