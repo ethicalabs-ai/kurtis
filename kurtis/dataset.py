@@ -1,8 +1,7 @@
 import click
-
-from datasets import load_dataset, concatenate_datasets
 import yaml
 
+from datasets import concatenate_datasets, load_dataset
 from kurtis.defaults import TrainingConfig
 
 
@@ -92,7 +91,7 @@ def load_datasets_from_yaml(yaml_path: str):
     """
     Load and merge datasets defined in a YAML configuration file.
     """
-    with open(yaml_path, "r") as f:
+    with open(yaml_path) as f:
         config = yaml.safe_load(f)
 
     datasets = []
@@ -130,9 +129,9 @@ def load_datasets_from_yaml(yaml_path: str):
 
         # Add metadata
         ds = ds.map(
-            lambda x: {
-                "dataset_name": path,
-                "dataset_domain": ds_config.get("domain", "general"),
+            lambda x, p=path, c=ds_config: {
+                "dataset_name": p,
+                "dataset_domain": c.get("domain", "general"),
             }
         )
 
@@ -153,9 +152,7 @@ def load_datasets_from_yaml(yaml_path: str):
             if filtered_datasets:
                 ds = concatenate_datasets(filtered_datasets)
             else:
-                print(
-                    "Warning: All rules returned empty datasets; using the full dataset."
-                )
+                print("Warning: All rules returned empty datasets; using the full dataset.")
 
         # Keep only necessary columns
         keep_cols = ["question", "answer", "dataset_name", "dataset_domain"]

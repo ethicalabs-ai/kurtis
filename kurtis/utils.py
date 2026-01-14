@@ -3,19 +3,18 @@
 import gc
 import importlib
 from types import ModuleType
-from typing import Optional, Tuple
 
 import click
 import pyfiglet
 import torch
+from nltk.tokenize import sent_tokenize
 from rich.console import Console
 from rich.panel import Panel
 from rich.style import Style
-from nltk.tokenize import sent_tokenize
 from transformers import PreTrainedTokenizer
 
 
-def get_kurtis_title() -> Tuple[str, str]:
+def get_kurtis_title() -> tuple[str, str]:
     """
     Returns the ASCII art title and panel text for Kurtis.
 
@@ -27,7 +26,7 @@ def get_kurtis_title() -> Tuple[str, str]:
     return title_art, panel_text
 
 
-def print_kurtis_title(console: Optional[Console] = None) -> None:
+def print_kurtis_title(console: Console | None = None) -> None:
     """
     Prints the Kurtis title and panel using Rich.
 
@@ -49,7 +48,7 @@ def print_kurtis_title(console: Optional[Console] = None) -> None:
     console.print("\n")
 
 
-def load_config(config_module: str = "kurtis.config.default") -> Optional[ModuleType]:
+def load_config(config_module: str = "kurtis.config.default") -> ModuleType | None:
     """
     Load a custom configuration module.
 
@@ -76,13 +75,7 @@ def get_device() -> str:
     Returns:
         str: "cuda" if CUDA is available, otherwise "cpu".
     """
-    return (
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps"
-        if torch.mps.is_available()
-        else "cpu"
-    )
+    return "cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu"
 
 
 def free_unused_memory() -> None:
@@ -99,9 +92,7 @@ def free_unused_memory() -> None:
 
 
 # Intelligent sentence splitting and truncating
-def clean_and_truncate(
-    text: str, max_length: int, tokenizer: PreTrainedTokenizer
-) -> str:
+def clean_and_truncate(text: str, max_length: int, tokenizer: PreTrainedTokenizer) -> str:
     text = text.strip()
     sentences = sent_tokenize(text)  # Split the text into sentences
     truncated_text = ""

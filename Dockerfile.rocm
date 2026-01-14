@@ -1,0 +1,49 @@
+# Use ROCm dev-ubuntu base image for AMD GPU support
+# https://hub.docker.com/r/rocm/dev-ubuntu-22.04
+FROM rocm/dev-ubuntu-22.04:7.1
+
+# Set user and workdir
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+RUN groupadd -g ${GROUP_ID} kurtis && \
+    useradd -m -u ${USER_ID} -g kurtis kurtis
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    build-essential \
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for uv
+ENV LC_CTYPE=C.utf8
+ENV UV_PROJECT_ENVIRONMENT="/app/.venv"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_PYTHON=python3.12
+ENV PATH="/home/kurtis/.local/bin:${PATH}"
+
+WORKDIR /app
+RUN chown kurtis:kurtis /app
+
+# Switch to non-root user
+USER kurtis
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Copy dependency files
+COPY --chown=kurtis:kurtis pyproject.toml uv.lock /app/
+
+# Sync dependencies for ROCm
+# We use --frozen to ensure we use the locked versions
+# We use --group rocm to include ROCm-specific dependencies (torch, triton, etc.)
+RUN uv sync --frozen --no-dev --group rocm --no-install-project
+
+# Copy the application code
+COPY --chown=kurtis:kurtis . /app
+
+# Run the Kurtis CLI by default
+ENTRYPOINT ["uv", "run", "python", "-m", "kurtis"]
+CMD ["--help"]

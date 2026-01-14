@@ -1,5 +1,4 @@
 from dataclasses import MISSING, dataclass, field, fields
-from typing import List, Dict
 
 
 @dataclass
@@ -25,7 +24,7 @@ class TrainingConfig:
     tf32: bool = False
     checkpointing: bool = True
     warmup_ratio: float = 0.03
-    num_train_epochs: int = 2
+    num_train_epochs: float = 2.0
     batch_size: int = 1
     max_length: int = 2048
     max_grad_norm: float = 1.0
@@ -35,11 +34,15 @@ class TrainingConfig:
     optim: str = "adamw_torch"
     weight_decay: float = 2e-2
     accumulation_steps: int = 8
+    logging_steps: int = 10
+    eval_steps: int = 100
+    eval_subset_size: int = 200
+
     final_checkpoint_name: str = "final_checkpoint"
     final_merged_checkpoint_name: str = "final_merged_checkpoint"
     dpo_final_checkpoint_name: str = "dpo_final_checkpoint"
     dpo_final_merged_checkpoint_name: str = "dpo_final_merged_checkpoint"
-    dataset_select: List[Dict] = field(default_factory=list)
+    dataset_select: list[dict] = field(default_factory=list)
     dataset_config_path: str = ""
 
     @classmethod

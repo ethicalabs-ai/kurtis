@@ -5,13 +5,13 @@
 #             creators.
 # -----------------------------------------------------------------------
 import os
+
 import click
 
-from kurtis.utils import get_device
 from kurtis.defaults import TrainingConfig
 from kurtis.model import load_model_and_tokenizer, save_and_merge_model
 from kurtis.train import train_model
-
+from kurtis.utils import get_device
 
 # Suppress tokenizer parallelism warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -19,9 +19,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 device = get_device()
 
 
-def handle_train(
-    config, model_name, model_dirname, output_merged_dir, output_dir, push_model
-):
+def handle_train(config, model_name, model_dirname, output_merged_dir, output_dir, push_model):
     """
     Train and optionally push the model to Hugging Face if specified.
     """
@@ -67,13 +65,10 @@ def command(ctx, output_dir, push_model):
     )
     cfg = TrainingConfig.from_dict(config.TRAINING_CONFIG)
     final_checkpoint_dir = os.path.join(model_dirname, cfg.final_checkpoint_name)
-    final_output_merged_dir = os.path.join(
-        model_dirname, cfg.final_merged_checkpoint_name
-    )
+    final_output_merged_dir = os.path.join(model_dirname, cfg.final_merged_checkpoint_name)
     save_and_merge_model(
         final_checkpoint_dir,
         final_output_merged_dir,
-        config.CHAT_TEMPLATE,
-        config.HF_REPO_ID,
-        push_model,
+        hf_repo_id=config.HF_REPO_ID,
+        push=push_model,
     )
