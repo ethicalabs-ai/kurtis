@@ -64,7 +64,7 @@ You can interact with Kurtis by either training the model or starting a chat ses
 Before training, preprocess the dataset to apply the chat template formatting:
 
 ```bash
-uv run kurtis --config-module kurtis.config.default model preprocess --output-path ./processed_dataset
+uv run kurtis --config-module kurtis.config.default dataset preprocess --output-path ./processed_dataset
 ```
 
 This will:

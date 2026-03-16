@@ -31,8 +31,7 @@ dependencies = [
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
+    { name = "torch" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4a/8e/ac2a9566747a93f8be36ee08532eb0160558b07630a081a6056a9f89bf1d/accelerate-1.12.0.tar.gz", hash = "sha256:70988c352feb481887077d2ab845125024b2a137a5090d6d7a32b57d03a45df6", size = 398399, upload-time = "2025-11-21T11:27:46.973Z" }
 wheels = [
@@ -184,8 +183,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "packaging" },
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
+    { name = "torch" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/19/6f/32d0526e4e4ad309d9e7502c018399bb23b63f39277a361c305092e2f885/bitsandbytes-0.49.1-py3-none-macosx_14_0_arm64.whl", hash = "sha256:9de01d4384b6c71ef9ab052b98457dc0e4fff8fe06ab14833b5b712700deb005", size = 129848, upload-time = "2026-01-08T14:31:26.134Z" },
@@ -825,14 +823,18 @@ name = "kurtis"
 version = "0.1.2"
 source = { editable = "." }
 dependencies = [
+    { name = "accelerate" },
+    { name = "bitsandbytes" },
     { name = "chardet" },
     { name = "click" },
     { name = "datasets" },
     { name = "einops" },
+    { name = "evaluate" },
     { name = "huggingface-hub", extra = ["hf-xet"] },
     { name = "nltk" },
     { name = "numpy" },
     { name = "openai" },
+    { name = "peft" },
     { name = "prompt-toolkit" },
     { name = "protobuf" },
     { name = "pyfiglet" },
@@ -844,7 +846,12 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "sentencepiece" },
     { name = "setuptools" },
+    { name = "torch" },
+    { name = "torchaudio" },
+    { name = "torchvision" },
     { name = "tqdm" },
+    { name = "transformers" },
+    { name = "trl" },
     { name = "urwid" },
 ]
 
@@ -859,32 +866,25 @@ dev = [
     { name = "ruff" },
 ]
 rocm = [
-    { name = "accelerate" },
-    { name = "bitsandbytes" },
-    { name = "evaluate" },
-    { name = "peft" },
     { name = "pytorch-triton-rocm", version = "3.6.0+git5261b273", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
     { name = "pytorch-triton-rocm", version = "3.6.0+git8fedd49b", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
-    { name = "torchaudio", version = "2.10.0.dev20251210+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torchaudio", version = "2.11.0.dev20260110+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
-    { name = "torchvision", version = "0.25.0.dev20251210+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torchvision", version = "0.25.0.dev20260110+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
-    { name = "transformers" },
-    { name = "trl" },
+    { name = "triton-rocm" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "accelerate" },
+    { name = "bitsandbytes", specifier = ">=0.46.1" },
     { name = "chardet", specifier = ">=5.2.0" },
     { name = "click", specifier = ">=8.1.7" },
     { name = "datasets", specifier = ">=3.1.0" },
     { name = "einops", specifier = ">=0.8.0" },
+    { name = "evaluate" },
     { name = "huggingface-hub", extras = ["hf-xet"], specifier = ">=0.30.2" },
     { name = "nltk", specifier = ">=3.9.1" },
     { name = "numpy", specifier = ">=2.1.3" },
     { name = "openai", specifier = ">=1.76.0" },
+    { name = "peft", specifier = ">=0.18.0" },
     { name = "prompt-toolkit", specifier = ">=3.0.48" },
     { name = "protobuf", specifier = ">=5.28.3" },
     { name = "pyfiglet", specifier = ">=1.0.2" },
@@ -896,7 +896,12 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.5.2" },
     { name = "sentencepiece", specifier = ">=0.2.0" },
     { name = "setuptools", specifier = ">=75.3.0" },
+    { name = "torch", specifier = ">=2.10.0", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
+    { name = "torchaudio", specifier = ">=2.10.0", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
+    { name = "torchvision", specifier = ">=0.25.0", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
     { name = "tqdm", specifier = ">=4.67.0" },
+    { name = "transformers", specifier = "==5.2.0" },
+    { name = "trl", specifier = ">0.25.1" },
     { name = "urwid", specifier = ">=2.6.16" },
 ]
 provides-extras = ["gpu"]
@@ -912,16 +917,8 @@ dev = [
     { name = "ruff", specifier = ">=0.14.10" },
 ]
 rocm = [
-    { name = "accelerate" },
-    { name = "bitsandbytes", specifier = ">=0.46.1" },
-    { name = "evaluate" },
-    { name = "peft" },
     { name = "pytorch-triton-rocm", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
-    { name = "torch", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
-    { name = "torchaudio", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
-    { name = "torchvision", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
-    { name = "transformers" },
-    { name = "trl" },
+    { name = "triton-rocm", index = "https://download.pytorch.org/whl/nightly/rocm7.1" },
 ]
 
 [[package]]
@@ -1337,8 +1334,7 @@ dependencies = [
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
+    { name = "torch" },
     { name = "tqdm" },
     { name = "transformers" },
 ]
@@ -1819,11 +1815,11 @@ resolution-markers = [
     "sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp312-cp312-linux_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp313-cp313-linux_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp313-cp313t-linux_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp314-cp314-linux_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp314-cp314t-linux_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp312-cp312-linux_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp313-cp313-linux_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp313-cp313t-linux_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp314-cp314-linux_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/pytorch_triton_rocm-3.6.0%2Bgit5261b273-cp314-cp314t-linux_x86_64.whl" },
 ]
 
 [[package]]
@@ -2295,112 +2291,53 @@ wheels = [
 
 [[package]]
 name = "torch"
-version = "2.10.0.dev20251208+rocm7.1"
+version = "2.12.0.dev20260315+rocm7.1"
 source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'linux'",
-]
 dependencies = [
-    { name = "filelock", marker = "sys_platform == 'linux'" },
-    { name = "fsspec", marker = "sys_platform == 'linux'" },
-    { name = "jinja2", marker = "sys_platform == 'linux'" },
-    { name = "networkx", marker = "sys_platform == 'linux'" },
-    { name = "pytorch-triton-rocm", version = "3.6.0+git5261b273", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-    { name = "setuptools", marker = "sys_platform == 'linux'" },
-    { name = "sympy", marker = "sys_platform == 'linux'" },
-    { name = "typing-extensions", marker = "sys_platform == 'linux'" },
+    { name = "filelock" },
+    { name = "fsspec" },
+    { name = "jinja2" },
+    { name = "networkx" },
+    { name = "setuptools" },
+    { name = "sympy" },
+    { name = "triton-rocm", marker = "sys_platform == 'linux'" },
+    { name = "typing-extensions" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torch-2.10.0.dev20251208%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torch-2.10.0.dev20251208%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torch-2.10.0.dev20251208%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torch-2.10.0.dev20251208%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torch-2.10.0.dev20251208%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
-]
-
-[[package]]
-name = "torch"
-version = "2.11.0.dev20260108+rocm7.1"
-source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'win32'",
-    "sys_platform == 'emscripten'",
-    "sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
-]
-dependencies = [
-    { name = "filelock", marker = "sys_platform != 'linux'" },
-    { name = "fsspec", marker = "sys_platform != 'linux'" },
-    { name = "jinja2", marker = "sys_platform != 'linux'" },
-    { name = "networkx", marker = "sys_platform != 'linux'" },
-    { name = "setuptools", marker = "sys_platform != 'linux'" },
-    { name = "sympy", marker = "sys_platform != 'linux'" },
-    { name = "typing-extensions", marker = "sys_platform != 'linux'" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torch-2.12.0.dev20260315%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torch-2.12.0.dev20260315%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torch-2.12.0.dev20260315%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torch-2.12.0.dev20260315%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torch-2.12.0.dev20260315%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
 ]
 
 [[package]]
 name = "torchaudio"
-version = "2.10.0.dev20251210+rocm7.1"
+version = "2.11.0.dev20260316+rocm7.1"
 source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'linux'",
-]
-dependencies = [
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
-]
 wheels = [
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.10.0.dev20251210%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.10.0.dev20251210%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.10.0.dev20251210%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.10.0.dev20251210%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.10.0.dev20251210%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
-]
-
-[[package]]
-name = "torchaudio"
-version = "2.11.0.dev20260110+rocm7.1"
-source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'win32'",
-    "sys_platform == 'emscripten'",
-    "sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
-]
-dependencies = [
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.11.0.dev20260316%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.11.0.dev20260316%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.11.0.dev20260316%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.11.0.dev20260316%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchaudio-2.11.0.dev20260316%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
 ]
 
 [[package]]
 name = "torchvision"
-version = "0.25.0.dev20251210+rocm7.1"
+version = "0.26.0.dev20260316+rocm7.1"
 source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'linux'",
-]
 dependencies = [
-    { name = "numpy", marker = "sys_platform == 'linux'" },
-    { name = "pillow", marker = "sys_platform == 'linux'" },
-    { name = "torch", version = "2.10.0.dev20251208+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform == 'linux'" },
+    { name = "numpy" },
+    { name = "pillow" },
+    { name = "torch" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchvision-0.25.0.dev20251210%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchvision-0.25.0.dev20251210%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchvision-0.25.0.dev20251210%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchvision-0.25.0.dev20251210%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/nightly/rocm7.1/torchvision-0.25.0.dev20251210%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
-]
-
-[[package]]
-name = "torchvision"
-version = "0.25.0.dev20260110+rocm7.1"
-source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
-resolution-markers = [
-    "sys_platform == 'win32'",
-    "sys_platform == 'emscripten'",
-    "sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
-]
-dependencies = [
-    { name = "numpy", marker = "sys_platform != 'linux'" },
-    { name = "pillow", marker = "sys_platform != 'linux'" },
-    { name = "torch", version = "2.11.0.dev20260108+rocm7.1", source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }, marker = "sys_platform != 'linux'" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchvision-0.26.0.dev20260316%2Brocm7.1-cp312-cp312-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchvision-0.26.0.dev20260316%2Brocm7.1-cp313-cp313-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchvision-0.26.0.dev20260316%2Brocm7.1-cp313-cp313t-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchvision-0.26.0.dev20260316%2Brocm7.1-cp314-cp314-manylinux_2_28_x86_64.whl" },
+    { url = "https://download-r2.pytorch.org/whl/nightly/rocm7.1/torchvision-0.26.0.dev20260316%2Brocm7.1-cp314-cp314t-manylinux_2_28_x86_64.whl" },
 ]
 
 [[package]]
@@ -2417,24 +2354,34 @@ wheels = [
 
 [[package]]
 name = "transformers"
-version = "5.0.0rc2"
+version = "5.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "filelock" },
     { name = "huggingface-hub" },
     { name = "numpy" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "regex" },
-    { name = "requests" },
     { name = "safetensors" },
     { name = "tokenizers" },
     { name = "tqdm" },
     { name = "typer-slim" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/e2/86b1bd5264272953370a5e50a91da38d7a53a87c5faf3fd3ff62d7353879/transformers-5.0.0rc2.tar.gz", hash = "sha256:9f2fa5e132433dd7eb910dc224b32de0baf758f3b6ffc918dbb632e0af85c07a", size = 8362532, upload-time = "2026-01-07T16:58:02.603Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/7e/8a0c57d562015e5b16c97c1f0b8e0e92ead2c7c20513225dc12c2043ba9f/transformers-5.2.0.tar.gz", hash = "sha256:0088b8b46ccc9eff1a1dca72b5d618a5ee3b1befc3e418c9512b35dea9f9a650", size = 8618176, upload-time = "2026-02-16T18:54:02.867Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/eb/9526a77354a2126f5b220f4792dc8494d573773c098dac6a5ad1fc7a5f17/transformers-5.0.0rc2-py3-none-any.whl", hash = "sha256:f8f2a14060ab11f20a0eec39d827af54c1589c327c5799d82808ae3f4167418a", size = 10067329, upload-time = "2026-01-07T16:57:59.617Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/93/79754b0ca486e556c2b95d4f5afc66aaf4b260694f3d6e1b51da2d036691/transformers-5.2.0-py3-none-any.whl", hash = "sha256:9ecaf243dc45bee11a7d93f8caf03746accc0cb069181bbf4ad8566c53e854b4", size = 10403304, upload-time = "2026-02-16T18:53:59.699Z" },
+]
+
+[[package]]
+name = "triton-rocm"
+version = "3.6.0+git9844da95"
+source = { registry = "https://download.pytorch.org/whl/nightly/rocm7.1" }
+wheels = [
+    { url = "https://download.pytorch.org/whl/nightly/triton_rocm-3.6.0%2Bgit9844da95-cp312-cp312-linux_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/nightly/triton_rocm-3.6.0%2Bgit9844da95-cp313-cp313-linux_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/nightly/triton_rocm-3.6.0%2Bgit9844da95-cp313-cp313t-linux_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/nightly/triton_rocm-3.6.0%2Bgit9844da95-cp314-cp314-linux_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/nightly/triton_rocm-3.6.0%2Bgit9844da95-cp314-cp314t-linux_x86_64.whl" },
 ]
 
 [[package]]

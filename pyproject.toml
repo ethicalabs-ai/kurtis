@@ -30,6 +30,15 @@ dependencies = [
     "python-slugify>=8.0.4",
     "huggingface-hub[hf-xet]>=0.30.2",
     "pyyaml>=6.0.2",
+    "torch>=2.10.0",
+    "torchaudio>=2.10.0",
+    "torchvision>=0.25.0",
+    "peft>=0.18.0",
+    "transformers==5.2.0",
+    "trl>0.25.1",
+    "evaluate",
+    "accelerate",
+    "bitsandbytes>=0.46.1",
 ]
 
 [project.optional-dependencies]
@@ -94,16 +103,8 @@ dev = [
     "pytest-cov>=7.0.0",
 ]
 rocm = [
-    "torch",
-    "torchaudio",
-    "torchvision",
     "pytorch-triton-rocm",
-    "peft",
-    "transformers",
-    "trl",
-    "evaluate",
-    "accelerate",
-    "bitsandbytes>=0.46.1",
+    "triton-rocm",
 ]
 
 [[tool.uv.index]]
@@ -121,6 +122,7 @@ torch = { index = "pytorch-rocm" }
 pytorch-triton-rocm = { index = "pytorch-rocm" }
 torchaudio = { index = "pytorch-rocm" }
 torchvision = { index = "pytorch-rocm" }
+triton-rocm = { index = "pytorch-rocm" }
 
 
 [tool.uv]

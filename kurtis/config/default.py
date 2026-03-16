@@ -11,24 +11,24 @@ from peft import LoraConfig, TaskType
 
 # Model Configuration
 # The base model to be fine-tuned
-TRANSFORMERS_MODEL_PRETRAINED = "ibm-granite/granite-4.0-h-350m"
+TRANSFORMERS_MODEL_PRETRAINED = "ethicalabs/Echo-DSRN-486M-v0.7.6-SFT"
 
 # Tokenizer used for preprocessing (data augmentation/cleaning)
 PREPROCESSING_TOKENIZER_MODEL = TRANSFORMERS_MODEL_PRETRAINED
 
 # Model name for inference
-INFERENCE_MODEL = "ethicalabs/Kurtis-Granite-4.0-350m"
+INFERENCE_MODEL = "models/Kurtis-Echo-DSRN-486M-SFT"
 
 # Name of the fine-tuned model
-MODEL_NAME = "Kurtis-Granite-4.0-350m-Instruct"
-MODEL_DPO_NAME = "Kurtis-Granite-4.0-350m-Instruct-DPO"
+MODEL_NAME = "Kurtis-EON1-Echo-DSRN-486M-SFT"
+MODEL_DPO_NAME = "Kurtis-EON1-Echo-DSRN-DPO"
 
 # Hugging Face Hub Repository IDs
-HF_REPO_ID = "ethicalabs/Kurtis-Granite-4.0-350m-Instruct"
-HF_DPO_REPO_ID = "ethicalabs/Kurtis-Granite-4.0-350m-Instruct-DPO"
+HF_REPO_ID = "ethicalabs/Kurtis-EON1-Echo-DSRN-486M-SFT"
+HF_DPO_REPO_ID = "ethicalabs/Kurtis-EON1-Echo-DSRN-486M-DPO"
 
 # Dataset Configuration
-DATASET_NAME = "ethicalabs/kurtis-mental-health-v2-sft-reasoning"
+DATASET_NAME = "ethicalabs/Kurtis-E1-Multilingual-01-SFT"
 DPO_DATASET_NAME = "mrs83/kurtis_mental_health_dpo"
 
 # API Configuration
@@ -39,12 +39,12 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "ollama")
 TRAINING_CONFIG = {
     "dataset_name": DATASET_NAME,
     "dataset_split": "train",
-    "prompt_column": "prompt",
-    "response_column": "completion",
-    "max_length": 1024,
-    "num_train_epochs": 0.25,
+    "prompt_column": "question",
+    "response_column": "answer",
+    "max_length": 32000,
+    "num_train_epochs": 1,
     "warmup_ratio": 0.1,
-    "batch_size": 8,
+    "batch_size": 4,
     "lr": 5e-5,
     "accumulation_steps": 1,
     "weight_decay": 2e-2,
@@ -81,9 +81,13 @@ LORA_CONFIG = LoraConfig(
     lora_alpha=24,
     lora_dropout=0.0075,
     target_modules=[
-        "input_linear",
-        "output_linear",
-        "in_proj",
+        "linear_read",
+        "linear_gate",
+        "linear_memory",
+        "linear_pred",
+        "mlp_up",
+        "mlp_down",
+        "qkv_proj",
         "out_proj",
     ],
     bias="none",
