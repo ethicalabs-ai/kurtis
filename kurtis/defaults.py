@@ -37,6 +37,7 @@ class TrainingConfig:
     logging_steps: int = 10
     eval_steps: int = 100
     eval_subset_size: int = 200
+    max_steps: int = -1  # -1 means use epochs
 
     final_checkpoint_name: str = "final_checkpoint"
     final_merged_checkpoint_name: str = "final_merged_checkpoint"

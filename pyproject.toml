@@ -11,9 +11,9 @@ dependencies = [
     "chardet>=5.2.0",
     "click>=8.1.7",
     "einops>=0.8.0",
-    "nltk>=3.9.1",
+    "nltk>=3.9.3",
     "prompt-toolkit>=3.0.48",
-    "protobuf>=5.28.3",
+    "protobuf>=6.33.5",
     "pyfiglet>=1.0.2",
     "rich>=13.9.4",
     "rouge-score>=0.1.2",
@@ -94,7 +94,7 @@ known-first-party = ["kurtis"]
 
 [dependency-groups]
 dev = [
-    "black>=25.12.0",
+    "black>=26.3.1",
     "isort>=7.0.0",
     "pre-commit>=4.5.1",
     "ruff>=0.14.10",
@@ -109,7 +109,7 @@ rocm = [
 
 [[tool.uv.index]]
 name = "pytorch-rocm"
-url = "https://download.pytorch.org/whl/nightly/rocm7.1"
+url = "https://download.pytorch.org/whl/rocm7.1"
 explicit = true
 
 [[tool.uv.index]]

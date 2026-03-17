@@ -69,9 +69,33 @@ def handle_train(
     default="./processed_dataset",
     help="Path to preprocessed dataset (if exists, will be used instead of loading from source)",
 )
+@click.option(
+    "--analysis-json",
+    help="Path to dataset analysis JSON to override hyperparameters.",
+)
 @click.pass_context
-def command(ctx, output_dir, push, model_name, dataset_config, preprocessed_dataset_path):
+def command(ctx, output_dir, push, model_name, dataset_config, preprocessed_dataset_path, analysis_json):
     config = ctx.obj["CONFIG"]
+    
+    # Load analysis results and override config if provided
+    if analysis_json and os.path.exists(analysis_json):
+        import json
+        click.echo(f"Applying optimized parameters from {analysis_json}...")
+        with open(analysis_json, "r") as f:
+            analysis_data = json.load(f)
+            if "suggested_hyperparams" in analysis_data:
+                suggested = analysis_data["suggested_hyperparams"]
+                # Map analysis names to TRAINING_CONFIG keys
+                if "lr" in suggested:
+                    config.TRAINING_CONFIG["lr"] = suggested["lr"]
+                if "epochs" in suggested:
+                    config.TRAINING_CONFIG["num_train_epochs"] = suggested["epochs"]
+                if "warmup_ratio" in suggested:
+                    config.TRAINING_CONFIG["warmup_ratio"] = suggested["warmup_ratio"]
+                if "weight_decay" in suggested:
+                    config.TRAINING_CONFIG["weight_decay"] = suggested["weight_decay"]
+                
+                click.echo(f"Overridden: lr={config.TRAINING_CONFIG.get('lr')}, epochs={config.TRAINING_CONFIG.get('num_train_epochs')}")
 
     # MPS Safety Check
     if torch.backends.mps.is_available():

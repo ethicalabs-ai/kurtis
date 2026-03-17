@@ -11,7 +11,7 @@ class AssistantMaskingCollator(DataCollatorForLanguageModeling):
     It expects the tokenizer to be set and a response_template to segment the input.
     """
 
-    response_template: str = "<|start_of_role|>assistant<|end_of_role|>"
+    response_template: str = "<|assistant|>\n"
     tokenizer: PreTrainedTokenizerBase = None
     mlm: bool = False
 

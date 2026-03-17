@@ -56,7 +56,7 @@ def load_model_and_tokenizer(
     click.echo(f"Loading model and tokenizer: {model_name}")
     # Always load the tokenizer from the original pretrained model.
     tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(
-        config.TRANSFORMERS_MODEL_PRETRAINED
+        config.TRANSFORMERS_MODEL_PRETRAINED, trust_remote_code=True
     )
     tokenizer.pad_token = tokenizer.eos_token
     # Use model's built-in chat template
@@ -66,6 +66,7 @@ def load_model_and_tokenizer(
         quantization_config=bnb_config,
         torch_dtype=torch_dtype,
         attn_implementation="eager",
+        trust_remote_code=True,
     )
     return model, tokenizer
 
@@ -91,7 +92,7 @@ def load_tokenizer_only(
             raise ValueError("Config must have TRANSFORMERS_MODEL_PRETRAINED attribute")
 
     click.echo(f"Loading tokenizer: {model_name}")
-    tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
     # Use model's built-in chat template
 
@@ -108,13 +109,29 @@ def save_and_merge_model(
     """Save the adapter model and tokenizer."""
     peft_config = PeftConfig.from_pretrained(final_checkpoint_dir)
     base_model_path = peft_config.base_model_name_or_path
-    tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
     # Use model's built-in chat template (do not override)
     model = AutoPeftModelForCausalLM.from_pretrained(
-        final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype
+        final_checkpoint_dir, device_map="auto", torch_dtype=torch_dtype, trust_remote_code=True
     )
     model = model.merge_and_unload()
-    model.save_pretrained(output_merged_dir, safe_serialization=True)
+    # Explicitly tie weights before saving
+    model.tie_weights()
+    
+    click.echo(f"Saving merged model to {output_merged_dir}...")
+    
+    # Filter out aliased keys to avoid shared tensor error (exactly as in Echo-DSRN merge_peft.py)
+    # The architecture uses .mlp_up and .mlp_down as the canonical names, while .mlp.0 and .mlp.2 are aliases.
+    state_dict = model.state_dict()
+    filtered_state_dict = {k: v for k, v in state_dict.items() if ".mlp." not in k}
+    
+    # Save with the filtered state dict. This works with safetensors (default).
+    model.save_pretrained(
+        output_merged_dir, 
+        state_dict=filtered_state_dict,
+        safe_serialization=True 
+    )
+            
     tokenizer.save_pretrained(output_merged_dir)
     if push and hf_repo_id:
         model.push_to_hub(hf_repo_id, "Upload model")

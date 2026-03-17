@@ -100,6 +100,7 @@ def train_model(
         gradient_checkpointing=cfg.checkpointing,
         gradient_accumulation_steps=cfg.accumulation_steps,
         num_train_epochs=cfg.num_train_epochs,
+        max_steps=cfg.max_steps,
         learning_rate=cfg.lr,
         lr_scheduler_type=cfg.lr_scheduler_type,
         warmup_ratio=cfg.warmup_ratio,
@@ -138,8 +139,8 @@ def train_model(
     # We want to train only on ASSISTANT_TEXT
 
     # The response template should match the pattern that marks the start of assistant response
-    # For Granite: "<|start_of_role|>assistant<|end_of_role|>"
-    response_template = "<|start_of_role|>assistant<|end_of_role|>"
+    # For Echo-DSRN: "<|assistant|>\n"
+    response_template = "<|assistant|>\n"
 
     from kurtis.collator import AssistantMaskingCollator
 
@@ -155,6 +156,7 @@ def train_model(
         "args": training_args,
         "peft_config": lora_config,
         "data_collator": data_collator,
+        "processing_class": tokenizer,
         "callbacks": [
             ValidationLossCallback(),
             EarlyStoppingCallback(early_stopping_patience=5),
